@@ -5,16 +5,16 @@ m_ProjectFiles:
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 639289714896509175
-    m_Hash: 1249732514
+      ticks: 639289715695723818
+    m_Hash: 847030592
   m_LockFileStatus:
     m_FilePath: C:/Users/konst/Documents/GameJamTennis/GameJamTennis/Packages/packages-lock.json
     m_PathExists: 1
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 639289714896771240
-    m_Hash: 1810784310
+      ticks: 639289715695810670
+    m_Hash: 1481093964
 m_EmbeddedPackageManifests:
   m_ManifestsStatus: {}
 m_LocalPackages:
@@ -1345,152 +1345,6 @@ m_ResolvedPackages:
     compatibilityLevel: 0
     minimumPackageVersion: 2.0.0
     minimumUnityVersion: 2019.2
-  compliance:
-    status: 0
-    violation:
-      scopePatternExpression: 
-      message: 
-      readMoreLink: 
-- packageId: com.unity.visualscripting@1.9.9
-  testable: 0
-  isDirectDependency: 1
-  version: 1.9.9
-  source: 1
-  resolvedPath: C:\Users\konst\Documents\GameJamTennis\GameJamTennis\Library\PackageCache\com.unity.visualscripting@191c0d7e3b69
-  assetPath: Packages/com.unity.visualscripting
-  name: com.unity.visualscripting
-  displayName: Visual Scripting
-  author:
-    name: 
-    email: 
-    url: 
-  category: 
-  type: tool
-  description: 'Visual scripting is a workflow that uses visual, node-based graphs
-    to design behaviors rather than write lines of C# script.
-
-
-    Enabling artists,
-    designers and programmers alike, visual scripting can be used to design final
-    logic, quickly create prototypes, iterate on gameplay and create custom nodes
-    to help streamline collaboration.
-
-
-    Visual scripting is compatible with third-party
-    APIs, including most packages, assets and custom libraries.'
-  errors: []
-  versions:
-    all:
-    - 1.5.0
-    - 1.5.1-pre.3
-    - 1.5.1-pre.5
-    - 1.5.1
-    - 1.5.2
-    - 1.6.0-pre.3
-    - 1.6.0
-    - 1.6.1
-    - 1.7.1
-    - 1.7.2
-    - 1.7.3
-    - 1.7.5
-    - 1.7.6
-    - 1.7.7
-    - 1.7.8
-    - 1.8.0-pre.1
-    - 1.8.0
-    - 1.9.0
-    - 1.9.1
-    - 1.9.2
-    - 1.9.4
-    - 1.9.5
-    - 1.9.6
-    - 1.9.7
-    - 1.9.8
-    - 1.9.9
-    - 1.9.10
-    - 1.9.11
-    - 1.9.12
-    - 1.9.13
-    compatible:
-    - 1.9.9
-    - 1.9.10
-    - 1.9.11
-    - 1.9.12
-    - 1.9.13
-    recommended: 1.9.13
-    deprecated:
-    - 1.8.0-pre.1
-  dependencies:
-  - name: com.unity.ugui
-    version: 1.0.0
-  - name: com.unity.modules.jsonserialize
-    version: 1.0.0
-  resolvedDependencies:
-  - name: com.unity.ugui
-    version: 2.0.0
-  - name: com.unity.modules.ui
-    version: 1.0.0
-  - name: com.unity.modules.imgui
-    version: 1.0.0
-  - name: com.unity.modules.jsonserialize
-    version: 1.0.0
-  keywords: []
-  registry:
-    id: main
-    name: 
-    url: https://packages.unity.com
-    scopes: []
-    isDefault: 1
-    capabilities: 7
-    configSource: 0
-    compliance:
-      status: 0
-      violations: []
-  hideInEditor: 1
-  entitlements:
-    licensingModel: 1
-  isAssetStorePackage: 0
-  datePublishedTicks: 638965671307960000
-  documentationUrl: 
-  hasRepository: 1
-  repository:
-    type: git
-    url: https://github.cds.internal.unity3d.com/unity/com.unity.visualscripting.git
-    revision: 2bb93a09becf00b2343d1c670afbf3836f170f55
-    path: 
-  unityLifecycle:
-    version: 1.9.9
-    nextVersion: 
-    recommendedVersion: 
-    isDeprecated: 0
-    deprecationMessage: 
-    isDiscoverable: 1
-  isDeprecated: 0
-  deprecationMessage: 
-  git:
-    hash: 
-    revision: 
-  upmReserved: '{"changelog":"### Fixed\n- Fixed broken links to example codes in
-    API documentation.\n\n### Changed\n- Adds alt texts to images in documentation
-    to increase accessibility for screen readers."}'
-  signature:
-    status: 1
-    reason: Signature is ok
-    attestation:
-      format: archive
-      publishingChannel: unity
-      entitlementKeys: []
-      ownerOrgName: 
-      ownerOrgId: 
-      publisherName: 
-    errorCode: 
-  assetStore:
-    productId: 
-  fingerprint: 191c0d7e3b69bc0df1b6fed3a997c4c3a765ef6a
-  editorCompatibility:
-    compatibilityLevel: 0
-    minimumPackageVersion: 1.9.9
-    minimumUnityVersion: 2021.3
   compliance:
     status: 0
     violation:

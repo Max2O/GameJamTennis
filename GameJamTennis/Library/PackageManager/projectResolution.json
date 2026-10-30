@@ -99,16 +99,6 @@
       "source": "builtin",
       "testable": false
     },
-    "com.unity.visualscripting@1.9.9": {
-      "name": "com.unity.visualscripting",
-      "displayName": "Visual Scripting",
-      "resolvedPath": "C:\\Users\\konst\\Documents\\GameJamTennis\\GameJamTennis\\Library\\PackageCache\\com.unity.visualscripting@191c0d7e3b69",
-      "fingerprint": "191c0d7e3b69bc0df1b6fed3a997c4c3a765ef6a",
-      "editorCompatibility": "2021.3.0a1",
-      "version": "1.9.9",
-      "source": "registry",
-      "testable": false
-    },
     "com.unity.modules.accessibility@1.0.0": {
       "name": "com.unity.modules.accessibility",
       "displayName": "Accessibility",
