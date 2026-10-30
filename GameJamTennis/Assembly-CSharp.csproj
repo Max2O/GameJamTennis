@@ -49,6 +49,8 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.3.10f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\PlayerBallBounceBack.cs" />
+    <Compile Include="Assets\Scripts\BallCaptureQTE.cs" />
     <Compile Include="Assets\Scripts\RoundStart.cs" />
     <Compile Include="Assets\Scripts\EnemyReturnTrajectory.cs" />
     <Compile Include="Assets\Scripts\EnemyBounceBack.cs" />
