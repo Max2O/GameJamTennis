@@ -7,16 +7,17 @@ public class BallCaptureQTE : MonoBehaviour
     public GameObject qteObject;
     bool QTEstarted = false;
     bool shouldBegin = true;
+
     [Tooltip("Cameras")]
-    public Camera attackcam;
+    private Transform startingCamPos;
     [SerializeField] private Camera mainCamera;
 
+    [Tooltip("QTE UI stuff")]
     [SerializeField] private TMP_Text timerText;
     [SerializeField] private RectTransform indicator;
     [SerializeField] private Transform ball;
     void Start(){
-        attackcam.enabled = false;
-        mainCamera.enabled = true;
+        //startingCamPos = mainCamera.gameObject.Transform;
         qteObject.SetActive(false);
     }
 
@@ -49,8 +50,6 @@ public class BallCaptureQTE : MonoBehaviour
             qteObject.SetActive(false);
             QTEstarted = false;
             shouldBegin = false;
-            mainCamera.enabled = false;
-            attackcam.enabled = true;
         }
     }
 
