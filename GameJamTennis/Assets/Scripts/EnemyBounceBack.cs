@@ -6,14 +6,16 @@ public class EnemyBounceBack : MonoBehaviour
     public GameObject playerHitbox;
     public BallCaptureQTE ballCaptureQTE;
     public GameObject ball;
-    [Tooltip("A non-trigger collider covering the player's half of the table.")]
-    public Collider playerSideTableArea;
-    [Tooltip("Optional net collider; the first arc will clear its top.")]
+    [Tooltip("Net collider; the first arc will clear its top.")]
     public Collider net;
     public float baseLaunchSpeed = 1.0f;
     public float minimumArcHeight = 0.1f;
 
     private bool hasReturnedBall;
+
+    [Header("Table Colliders")]
+    [SerializeField] private Collider tableSurface;
+    [SerializeField] private Collider playerSideTableArea;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -70,7 +72,7 @@ public class EnemyBounceBack : MonoBehaviour
         ballCaptureQTE.shouldBegin = true;
         trajectory.Begin(
             ballBody,
-            playerSideTableArea,
+            tableSurface,
             playerCollider,
             net,
             landingPoint,
@@ -233,5 +235,10 @@ public class EnemyBounceBack : MonoBehaviour
         }
 
         intersections[intersectionCount++] = point;
+    }
+
+    public void ResetRoundState()
+    {
+        hasReturnedBall = false;
     }
 }

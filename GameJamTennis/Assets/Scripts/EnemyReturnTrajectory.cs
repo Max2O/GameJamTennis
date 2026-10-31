@@ -20,6 +20,7 @@ public class EnemyReturnTrajectory : MonoBehaviour
     private float minimumArcHeight;
     private float ballRadius;
     private FlightLeg currentLeg;
+    public bool IsHeadingToPlayer => currentLeg == FlightLeg.ToPlayer;
 
     public void Begin(
         Rigidbody body,
@@ -71,11 +72,13 @@ public class EnemyReturnTrajectory : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (currentLeg == FlightLeg.ToPlayer && other == playerHitbox)
+        if (currentLeg != FlightLeg.ToPlayer)
+            return;
+
+        if (other == playerHitbox ||
+            other.transform.IsChildOf(playerHitbox.transform))
         {
             currentLeg = FlightLeg.Complete;
-            ballBody.linearVelocity = Vector3.zero;
-            ballBody.angularVelocity = Vector3.zero;
         }
     }
 
@@ -200,5 +203,16 @@ public class EnemyReturnTrajectory : MonoBehaviour
         }
 
         return duration;
+    }
+
+    public void ResetTrajectory()
+    {
+        currentLeg = FlightLeg.Complete;
+
+        if (ballBody != null)
+        {
+            ballBody.linearVelocity = Vector3.zero;
+            ballBody.angularVelocity = Vector3.zero;
+        }
     }
 }

@@ -27,7 +27,6 @@ public class AttackManager : MonoBehaviour
 
     [Header("Camera")]
     [SerializeField] private float cameraTransitionDuration = 0.7f;
-    [SerializeField] private Camera aimOverlayCamera;
 
     [Header("Trajectory Preview")]
     [SerializeField] private int trajectoryPoints = 40;
@@ -35,7 +34,6 @@ public class AttackManager : MonoBehaviour
     [Header("Aim Timer")]
     [SerializeField] private float aimTimeLimit = 1.3f;
     [SerializeField] private Collider netCollider;
-    [SerializeField] private float timeoutImpulse = 8f;
 
     [Header("Timeout Shot")]
     [SerializeField] private float timeoutShotSpeed = 5f;

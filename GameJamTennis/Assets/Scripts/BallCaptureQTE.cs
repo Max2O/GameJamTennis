@@ -8,6 +8,7 @@ public class BallCaptureQTE : MonoBehaviour
     bool QTEstarted = false;
     public bool shouldBegin = true;
 
+    [SerializeField] private GameOver gameOver;
     [SerializeField] private AttackManager attackManager;
     [Tooltip("Camera")]
     [SerializeField] private Camera mainCamera;
@@ -57,23 +58,36 @@ public class BallCaptureQTE : MonoBehaviour
         qteObject.SetActive(false);
     }
 
-    void OnTriggerEnter(Collider other){
-        if (other.TryGetComponent<EnemyReturnTrajectory>(out EnemyReturnTrajectory ert) && shouldBegin){
-            UpdateIndicator();
-            Time.timeScale = 0f;
-            QTEstarted = true;
-            qteObject.SetActive(true);
-            Rigidbody incomingBall = other.attachedRigidbody;
+    void OnTriggerEnter(Collider other)
+    {
+        if (!shouldBegin || QTEstarted)
+            return;
 
-            if (incomingBall == null)
+        if (!other.CompareTag("Ball"))
+            return;
+
+        EnemyReturnTrajectory trajectory =
+            other.GetComponent<EnemyReturnTrajectory>();
+
+        // First QTE: player starts the game, so no enemy trajectory exists.
+        if (!isFirstQte)
+        {
+            if (trajectory == null || !trajectory.IsHeadingToPlayer)
                 return;
-
-            float incomingSpeed = incomingBall.linearVelocity.magnitude;
-
-            QTEtimer = CalculateQteDuration(incomingSpeed);
-
-            Time.timeScale = 0f;
         }
+
+        Rigidbody incomingBall = other.attachedRigidbody;
+
+        if (incomingBall == null)
+            return;
+
+        QTEtimer = CalculateQteDuration(incomingBall.linearVelocity.magnitude);
+
+        UpdateIndicator();
+
+        QTEstarted = true;
+        qteObject.SetActive(true);
+        Time.timeScale = 0f;
     }
 
     void Update(){
@@ -85,6 +99,7 @@ public class BallCaptureQTE : MonoBehaviour
                 QTEstarted = false;
                 shouldBegin = false;
                 Time.timeScale = 1f;
+                gameOver.PlayersFault = true;
             }
         }
     }
@@ -115,5 +130,17 @@ public class BallCaptureQTE : MonoBehaviour
             mainCamera.WorldToScreenPoint(ball.position);
 
         indicator.position = screenPosition;
+    }
+
+    public void ResetQTEState()
+    {
+        QTEtimer = 0f;
+        QTEstarted = false;
+        shouldBegin = true;
+        isFirstQte = true;
+
+        qteObject.SetActive(false);
+
+        Time.timeScale = 0f;
     }
 }
