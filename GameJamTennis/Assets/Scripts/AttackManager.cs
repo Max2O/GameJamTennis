@@ -11,6 +11,8 @@ public class AttackManager : MonoBehaviour
         MovingBack
     }
 
+    public bool IsAiming { get; private set; }
+
     [Header("References")]
     [SerializeField] private Camera mainCamera;
     [SerializeField] private Transform overheadCameraPosition;
@@ -92,6 +94,7 @@ public class AttackManager : MonoBehaviour
             overheadCameraPosition.rotation,
             AttackState.MovingToAim
         );
+        IsAiming = true;
     }
 
     private void Update()
@@ -257,5 +260,6 @@ public class AttackManager : MonoBehaviour
 
         state = AttackState.Inactive;
         Time.timeScale = 1f;
+        IsAiming = false;
     }
 }
