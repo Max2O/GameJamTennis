@@ -26,7 +26,7 @@ public class AttackManager : MonoBehaviour
     [SerializeField] private float cameraTransitionDuration = 0.7f;
 
     [Header("Trajectory Preview")]
-    [SerializeField] private float previewFlightTime = 1.2f;
+    [SerializeField] private float previewFlightTime = 0.4f;
     [SerializeField] private int trajectoryPoints = 40;
 
     private AttackState state = AttackState.Inactive;
@@ -152,9 +152,6 @@ public class AttackManager : MonoBehaviour
 
         if (hasValidTarget && Input.GetMouseButtonDown(0))
             ConfirmTarget();
-
-        if (Input.GetMouseButtonDown(1))
-            CancelAiming();
     }
 
     private void UpdateTargeting()
@@ -224,17 +221,6 @@ public class AttackManager : MonoBehaviour
 
     private void ConfirmTarget()
     {
-        StartCameraTransition(
-            originalCameraPosition,
-            originalCameraRotation,
-            AttackState.MovingBack
-        );
-    }
-
-    private void CancelAiming()
-    {
-        hasValidTarget = false;
-
         StartCameraTransition(
             originalCameraPosition,
             originalCameraRotation,
