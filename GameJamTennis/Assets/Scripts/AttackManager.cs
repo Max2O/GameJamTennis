@@ -26,7 +26,6 @@ public class AttackManager : MonoBehaviour
     [SerializeField] private float cameraTransitionDuration = 0.7f;
 
     [Header("Trajectory Preview")]
-    [SerializeField] private float previewFlightTime = 0.4f;
     [SerializeField] private int trajectoryPoints = 40;
 
     private AttackState state = AttackState.Inactive;
@@ -46,6 +45,9 @@ public class AttackManager : MonoBehaviour
     private Vector3 selectedTarget;
     private bool hasValidTarget;
 
+    private PlayerShot playerShot;
+    private bool shotConfirmed;
+
     private void Awake()
     {
         if (mainCamera == null)
@@ -63,6 +65,16 @@ public class AttackManager : MonoBehaviour
 
         ball = receivedBall;
 
+        playerShot = ball.GetComponent<PlayerShot>();
+
+        if (playerShot == null)
+        {
+            Debug.LogError("The ball is missing its PlayerShot component!");
+            return;
+        }
+
+        shotConfirmed = false;
+
         Time.timeScale = 0f;
 
         originalCameraPosition = mainCamera.transform.position;
@@ -71,8 +83,7 @@ public class AttackManager : MonoBehaviour
         aimMarker.gameObject.SetActive(true);
         trajectoryLine.enabled = true;
 
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = false;
 
         hasValidTarget = false;
 
@@ -165,15 +176,19 @@ public class AttackManager : MonoBehaviour
             aimSurfaceMask,
             QueryTriggerInteraction.Ignore))
         {
-            selectedTarget = hit.point;
-            selectedTarget.y += landingHeightOffset;
+            Collider ballCollider = ball.GetComponent<Collider>();
+
+            float ballRadius = ballCollider != null
+                ? ballCollider.bounds.extents.y
+                : 0f;
+
+            selectedTarget = hit.point +
+                Vector3.up * (ballRadius + landingHeightOffset);
+
+            hasValidTarget = UpdateTrajectory();
 
             aimMarker.position = selectedTarget;
-            aimMarker.gameObject.SetActive(true);
-
-            hasValidTarget = true;
-
-            UpdateTrajectory();
+            aimMarker.gameObject.SetActive(hasValidTarget);
         }
         else
         {
@@ -183,44 +198,44 @@ public class AttackManager : MonoBehaviour
         }
     }
 
-    private Vector3 CalculatePreviewVelocity(
-        Vector3 origin,
-        Vector3 destination)
+    private bool UpdateTrajectory()
     {
-        Vector3 gravity = Physics.gravity;
-
-        return (destination - origin) / previewFlightTime
-               - 0.5f * gravity * previewFlightTime;
-    }
-
-    private void UpdateTrajectory()
-    {
-        Vector3 origin = ball.position;
-
-        Vector3 velocity = CalculatePreviewVelocity(
-            origin,
-            selectedTarget
-        );
+        if (!playerShot.TryCalculatePreview(
+            ball.position,
+            selectedTarget,
+            out Vector3 velocity,
+            out float flightTime))
+        {
+            trajectoryLine.enabled = false;
+            return false;
+        }
 
         int count = Mathf.Max(2, trajectoryPoints);
 
         trajectoryLine.positionCount = count;
+        trajectoryLine.enabled = true;
 
         for (int i = 0; i < count; i++)
         {
-            float t = previewFlightTime * i / (count - 1);
+            float progress = (float)i / (count - 1);
+            float elapsedTime = flightTime * progress;
 
-            Vector3 position =
-                origin +
-                velocity * t +
-                0.5f * Physics.gravity * t * t;
+            Vector3 position = playerShot.EvaluateTrajectory(
+                ball.position,
+                velocity,
+                elapsedTime
+            );
 
             trajectoryLine.SetPosition(i, position);
         }
+
+        return true;
     }
 
     private void ConfirmTarget()
     {
+        shotConfirmed = true;
+
         StartCameraTransition(
             originalCameraPosition,
             originalCameraRotation,
@@ -233,13 +248,14 @@ public class AttackManager : MonoBehaviour
         aimMarker.gameObject.SetActive(false);
         trajectoryLine.enabled = false;
 
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = true;
+
+        if (shotConfirmed)
+        {
+            playerShot.LaunchShot(selectedTarget);
+        }
 
         state = AttackState.Inactive;
-
-        // Temporary: resume gameplay after aiming.
-        // PlayerShot will take over this responsibility later.
         Time.timeScale = 1f;
     }
 }

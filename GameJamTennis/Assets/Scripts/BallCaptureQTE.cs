@@ -6,7 +6,7 @@ public class BallCaptureQTE : MonoBehaviour
     public float QTEtimer = 0.0f;
     public GameObject qteObject;
     bool QTEstarted = false;
-    bool shouldBegin = true;
+    public bool shouldBegin = true;
 
     [SerializeField] private AttackManager attackManager;
     [Tooltip("Camera")]

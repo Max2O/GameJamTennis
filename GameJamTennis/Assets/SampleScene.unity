@@ -222,7 +222,7 @@ LineRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 289654257}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -239,7 +239,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 78496e288504c4e48ad6d85b8b746810, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -273,7 +273,7 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 1
+        value: 0.073682785
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -310,10 +310,10 @@ LineRenderer:
       atime6: 0
       atime7: 0
       m_Mode: 0
-      m_ColorSpace: -1
+      m_ColorSpace: 0
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
-    numCornerVertices: 0
+    numCornerVertices: 1
     numCapVertices: 0
     alignment: 0
     textureMode: 0
@@ -332,7 +332,7 @@ Transform:
   m_GameObject: {fileID: 289654257}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1232.5673, y: -64.05, z: -2.154}
+  m_LocalPosition: {x: 0, y: 0, z: -0.025}
   m_LocalScale: {x: 0.07369, y: 0.0088428, z: 0.07369}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -501,7 +501,7 @@ Transform:
   m_GameObject: {fileID: 331571921}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0, z: 0.00014}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -514,7 +514,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 331571921}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 82757ae1545926842939dc30bec65609, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1414,6 +1414,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBounceBack
   bouncebackPercent: 200
   playerHitbox: {fileID: 1888101114}
+  ballCaptureQTE: {fileID: 1888101117}
   ball: {fileID: 4085996643442510468}
   playerSideTableArea: {fileID: 1575550751}
   net: {fileID: 7703866214700848406}
@@ -1985,6 +1986,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BallCaptureQTE
   QTEtimer: 0
   qteObject: {fileID: 1449496685}
+  shouldBegin: 1
   attackManager: {fileID: 1888101118}
   mainCamera: {fileID: 330585545}
   timerText: {fileID: 1784886281}
@@ -2095,6 +2097,7 @@ GameObject:
   - component: {fileID: 6638213139023779478}
   - component: {fileID: 6638213139023779479}
   - component: {fileID: 6638213139023779480}
+  - component: {fileID: 6638213139023779481}
   m_Layer: 0
   m_Name: BALL
   m_TagString: Untagged
@@ -2261,6 +2264,25 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &6638213139023779481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4085996643442510468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08a2faf463ec1aa459558a066694370c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerShot
+  lowBallHeight: 0.15
+  highBallHeight: 1.2
+  maximumShotDistance: 2
+  maximumDownwardSpeed: 3.5
+  maximumLobSpeed: 5
+  heightArcWeight: 0.65
+  distanceArcWeight: 0.35
 --- !u!33 &6682388749764042676
 MeshFilter:
   m_ObjectHideFlags: 0

@@ -4,6 +4,7 @@ public class EnemyBounceBack : MonoBehaviour
 {
     public float bouncebackPercent = 100.0f;
     public GameObject playerHitbox;
+    public BallCaptureQTE ballCaptureQTE;
     public GameObject ball;
     [Tooltip("A non-trigger collider covering the player's half of the table.")]
     public Collider playerSideTableArea;
@@ -31,14 +32,6 @@ public class EnemyBounceBack : MonoBehaviour
             ? playerHitbox.GetComponentInChildren<Collider>()
             : null;
         Collider ballCollider = ball.GetComponent<Collider>();
-
-        if (playerCollider == null || playerSideTableArea == null || ballCollider == null)
-        {
-            Debug.LogError(
-                "EnemyBounceBack requires a player hitbox collider, ball collider, and player-side table collider.",
-                this);
-            return;
-        }
 
         if (bouncebackPercent <= 0.0f || baseLaunchSpeed <= 0.0f || minimumArcHeight < 0.0f)
         {
@@ -74,6 +67,7 @@ public class EnemyBounceBack : MonoBehaviour
         }
 
         hasReturnedBall = true;
+        ballCaptureQTE.shouldBegin = true;
         trajectory.Begin(
             ballBody,
             playerSideTableArea,
