@@ -8,8 +8,8 @@ public class BallCaptureQTE : MonoBehaviour
     bool QTEstarted = false;
     bool shouldBegin = true;
 
-    [Tooltip("Cameras")]
-    private Transform startingCamPos;
+    [SerializeField] private AttackManager attackManager;
+    [Tooltip("Camera")]
     [SerializeField] private Camera mainCamera;
 
     [Tooltip("QTE UI stuff")]
@@ -45,11 +45,23 @@ public class BallCaptureQTE : MonoBehaviour
         }
     }
 
-    public void QTEwin(){
-        if(QTEtimer > 0){
-            qteObject.SetActive(false);
-            QTEstarted = false;
-            shouldBegin = false;
+    public void QTEwin()
+    {
+        if (!QTEstarted || QTEtimer <= 0f)
+            return;
+
+        qteObject.SetActive(false);
+        QTEstarted = false;
+        shouldBegin = false;
+
+        if (attackManager != null)
+        {
+            attackManager.BeginAiming(ball);
+        }
+        else
+        {
+            Debug.LogError("AttackManager is not assigned!");
+            Time.timeScale = 1f;
         }
     }
 

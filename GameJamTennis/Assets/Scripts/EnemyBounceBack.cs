@@ -9,8 +9,8 @@ public class EnemyBounceBack : MonoBehaviour
     public Collider playerSideTableArea;
     [Tooltip("Optional net collider; the first arc will clear its top.")]
     public Collider net;
-    public float baseLaunchSpeed = 7.0f;
-    public float minimumArcHeight = 1.0f;
+    public float baseLaunchSpeed = 1.0f;
+    public float minimumArcHeight = 0.1f;
 
     private bool hasReturnedBall;
 

@@ -52,6 +52,7 @@
     <Compile Include="Assets\Scripts\PlayerBallBounceBack.cs" />
     <Compile Include="Assets\Scripts\BallCaptureQTE.cs" />
     <Compile Include="Assets\Scripts\EnemyBounceBack.cs" />
+    <Compile Include="Assets\Scripts\AttackManager.cs" />
     <Compile Include="Assets\Scripts\RoundStart.cs" />
     <Compile Include="Assets\Scripts\EnemyReturnTrajectory.cs" />
   </ItemGroup>
