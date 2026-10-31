@@ -2,13 +2,16 @@ using UnityEngine;
 
 public class RoundStart : MonoBehaviour
 {
-    public GameObject Player;
+    [SerializeField] private float firstQteDuration = 5f;
+    public GameObject player;
+    public GameObject ball;
     [SerializeField] private GameObject StartingShade;
     private BallCaptureQTE ballCaptureQTE;
 
     void Start(){
         Time.timeScale = 0f;
-        ballCaptureQTE = Player.GetComponent<BallCaptureQTE>();
+        ballCaptureQTE = player.GetComponent<BallCaptureQTE>();
+        ballCaptureQTE.SetFirstQteDuration(firstQteDuration);
     }
 
     public void StartRound(){

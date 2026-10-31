@@ -1,4 +1,5 @@
-
+using TMPro;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class AttackManager : MonoBehaviour
@@ -26,9 +27,29 @@ public class AttackManager : MonoBehaviour
 
     [Header("Camera")]
     [SerializeField] private float cameraTransitionDuration = 0.7f;
+    [SerializeField] private Camera aimOverlayCamera;
 
     [Header("Trajectory Preview")]
     [SerializeField] private int trajectoryPoints = 40;
+
+    [Header("Aim Timer")]
+    [SerializeField] private float aimTimeLimit = 1.3f;
+    [SerializeField] private Collider netCollider;
+    [SerializeField] private float timeoutImpulse = 8f;
+
+    [Header("Timeout Shot")]
+    [SerializeField] private float timeoutShotSpeed = 5f;
+    [SerializeField] private float timeoutRandomness = 0.25f;
+
+    [Header("Aim Timer UI")]
+    [SerializeField] private GameObject aimTimerUI;
+    [SerializeField] private Slider aimTimerSlider;
+    [SerializeField] private TMP_Text aimTimerText;
+
+    private float aimTimeRemaining;
+    private bool firstAimingPhase = true;
+    private bool shotTimedOut;
+    private Vector3 timeoutTarget;
 
     private AttackState state = AttackState.Inactive;
 
@@ -55,6 +76,12 @@ public class AttackManager : MonoBehaviour
         if (mainCamera == null)
             mainCamera = Camera.main;
 
+        aimTimerUI.SetActive(false);
+
+        aimTimerSlider.minValue = 0f;
+        aimTimerSlider.maxValue = 1f;
+        aimTimerSlider.value = 1f;
+
         aimMarker.gameObject.SetActive(false);
         trajectoryLine.enabled = false;
         trajectoryLine.useWorldSpace = true;
@@ -74,6 +101,9 @@ public class AttackManager : MonoBehaviour
             Debug.LogError("The ball is missing its PlayerShot component!");
             return;
         }
+
+        shotTimedOut = false;
+        aimTimeRemaining = 0f;
 
         shotConfirmed = false;
 
@@ -153,10 +183,26 @@ public class AttackManager : MonoBehaviour
         if (progress >= 1f)
         {
             if (state == AttackState.MovingToAim)
+            {
                 state = AttackState.Aiming;
 
+                if (firstAimingPhase)
+                {
+                    aimTimeRemaining = Mathf.Infinity;
+                    firstAimingPhase = false;
+                }
+                else
+                {
+                    aimTimeRemaining = aimTimeLimit;
+                }
+
+                aimTimerUI.SetActive(true);
+                UpdateAimTimerUI();
+            }
             else if (state == AttackState.MovingBack)
+            {
                 FinishAiming();
+            }
         }
     }
 
@@ -165,7 +211,102 @@ public class AttackManager : MonoBehaviour
         UpdateTargeting();
 
         if (hasValidTarget && Input.GetMouseButtonDown(0))
+        {
             ConfirmTarget();
+            return;
+        }
+
+        if (!float.IsInfinity(aimTimeRemaining))
+        {
+            aimTimeRemaining -= Time.unscaledDeltaTime;
+
+            UpdateAimTimerUI();
+
+            if (aimTimeRemaining <= 0f)
+            {
+                TimeoutShot();
+            }
+        }
+    }
+
+    private void TimeoutShot()
+    {
+        if (state != AttackState.Aiming)
+            return;
+
+        if (netCollider == null)
+        {
+            Debug.LogError("AttackManager: No net collider assigned!");
+            return;
+        }
+
+        shotTimedOut = true;
+        shotConfirmed = false;
+
+        timeoutTarget = GetRandomNetTarget();
+
+        aimMarker.gameObject.SetActive(false);
+        trajectoryLine.enabled = false;
+
+        StartCameraTransition(
+            originalCameraPosition,
+            originalCameraRotation,
+            AttackState.MovingBack
+        );
+    }
+
+    private void UpdateAimTimerUI()
+    {
+        if (float.IsInfinity(aimTimeRemaining))
+        {
+            aimTimerSlider.value = 1f;
+            aimTimerText.text = "∞";
+            return;
+        }
+
+        float normalizedTime = Mathf.Clamp01(
+            aimTimeRemaining / aimTimeLimit
+        );
+
+        aimTimerSlider.value = normalizedTime;
+        aimTimerText.text = Mathf.Max(0f, aimTimeRemaining).ToString("F1") + "s";
+    }
+
+    private Vector3 GetRandomNetTarget()
+    {
+        Bounds bounds = netCollider.bounds;
+
+        // Find the thinnest world-space axis of the net.
+        Vector3 size = bounds.size;
+
+        int thinAxis = 0;
+        if (size.y < size.x) thinAxis = 1;
+        if (size.z < size[thinAxis]) thinAxis = 2;
+
+        // Start with the point on the net closest to the ball.
+        Vector3 basePoint = netCollider.ClosestPoint(ball.position);
+
+        Vector3 randomOffset = Vector3.zero;
+
+        // Randomize along the two broad axes, but only slightly.
+        for (int axis = 0; axis < 3; axis++)
+        {
+            if (axis == thinAxis)
+                continue;
+
+            float variation = size[axis] * timeoutRandomness;
+
+            randomOffset[axis] = Random.Range(
+                -variation,
+                variation
+            );
+        }
+
+        // Project the randomized position onto the actual collider.
+        Vector3 candidate = basePoint + randomOffset;
+        Vector3 target = netCollider.ClosestPoint(candidate);
+
+        return target;
     }
 
     private void UpdateTargeting()
@@ -250,16 +391,36 @@ public class AttackManager : MonoBehaviour
     {
         aimMarker.gameObject.SetActive(false);
         trajectoryLine.enabled = false;
-
         Cursor.visible = true;
+        aimTimerUI.SetActive(false);
 
-        if (shotConfirmed)
+        // Resume physics before applying the timeout impulse.
+        Time.timeScale = 1f;
+
+        if (shotTimedOut)
+        {
+            Rigidbody ballBody = ball.GetComponent<Rigidbody>();
+
+            if (ballBody != null)
+            {
+                Vector3 direction = (timeoutTarget - ball.position).normalized;
+
+                ballBody.linearVelocity = Vector3.zero;
+                ballBody.angularVelocity = Vector3.zero;
+
+                // Give the ball a controlled velocity toward the net.
+                ballBody.AddForce(
+                    direction * timeoutShotSpeed * ballBody.mass,
+                    ForceMode.Impulse
+                );
+            }
+        }
+        else if (shotConfirmed)
         {
             playerShot.LaunchShot(selectedTarget);
         }
 
         state = AttackState.Inactive;
-        Time.timeScale = 1f;
         IsAiming = false;
     }
 }

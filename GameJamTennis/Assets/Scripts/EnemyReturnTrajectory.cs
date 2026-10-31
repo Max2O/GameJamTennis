@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class EnemyReturnTrajectory : MonoBehaviour
 {
-    private const float MaterialInfluence = 0.5f;
-
     private enum FlightLeg
     {
         ToTable,
@@ -129,8 +127,6 @@ public class EnemyReturnTrajectory : MonoBehaviour
             ballMaterial != null ? ballMaterial.frictionCombine : PhysicsMaterialCombine.Average,
             tableMaterial != null ? tableMaterial.dynamicFriction : 0.6f,
             tableMaterial != null ? tableMaterial.frictionCombine : PhysicsMaterialCombine.Average);
-        restitution *= MaterialInfluence;
-        friction *= MaterialInfluence;
 
         Vector3 tangentVelocity = Vector3.ProjectOnPlane(incomingVelocity, normal);
         float frictionImpulse = friction * (1.0f + restitution) * incomingNormalSpeed;

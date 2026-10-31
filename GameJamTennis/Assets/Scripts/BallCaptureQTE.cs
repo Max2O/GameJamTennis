@@ -16,8 +16,44 @@ public class BallCaptureQTE : MonoBehaviour
     [SerializeField] private TMP_Text timerText;
     [SerializeField] private RectTransform indicator;
     [SerializeField] private Transform ball;
+
+    [Header("QTE Timing")]
+    [SerializeField] private float normalQteDuration = 3f;
+    [SerializeField] private float firstQteDuration = 5f;
+
+    [SerializeField] private float velocityThreshold = 3f;
+    [SerializeField] private float velocityDecay = 2f;
+    [SerializeField] private float minimumQteDuration = 1f;
+
+    private bool isFirstQte = true;
+
+    public void SetFirstQteDuration(float duration)
+    {
+        firstQteDuration = Mathf.Max(0.1f, duration);
+    }
+
+    private float CalculateQteDuration(float incomingSpeed)
+    {
+        if (isFirstQte)
+        {
+            isFirstQte = false;
+            return firstQteDuration;
+        }
+
+        if (incomingSpeed <= velocityThreshold)
+            return normalQteDuration;
+
+        float excessSpeed = incomingSpeed - velocityThreshold;
+
+        float duration =
+            minimumQteDuration +
+            (normalQteDuration - minimumQteDuration) *
+            Mathf.Exp(-velocityDecay * excessSpeed);
+
+        return Mathf.Clamp(duration, minimumQteDuration, normalQteDuration);
+    }
+
     void Start(){
-        //startingCamPos = mainCamera.gameObject.Transform;
         qteObject.SetActive(false);
     }
 
@@ -27,8 +63,16 @@ public class BallCaptureQTE : MonoBehaviour
             Time.timeScale = 0f;
             QTEstarted = true;
             qteObject.SetActive(true);
-            QTEtimer = 3.0f;
-            // Camera.main.WorldToScreenPoint(worldPosition);
+            Rigidbody incomingBall = other.attachedRigidbody;
+
+            if (incomingBall == null)
+                return;
+
+            float incomingSpeed = incomingBall.linearVelocity.magnitude;
+
+            QTEtimer = CalculateQteDuration(incomingSpeed);
+
+            Time.timeScale = 0f;
         }
     }
 
