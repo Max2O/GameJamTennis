@@ -3870,13 +3870,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08a2faf463ec1aa459558a066694370c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerShot
-  lowBallHeight: -65
-  highBallHeight: -66
+  lowBallHeight: 0.15
+  highBallHeight: 0.8
   maximumShotDistance: 2
-  maximumDownwardSpeed: 3.5
-  maximumLobSpeed: 5
+  maximumSmashDrop: 0.5
+  maximumLobHeight: 1.5
   heightArcWeight: 0.65
   distanceArcWeight: 0.35
+  tableHeight: -66.33
 --- !u!114 &6638213139023779482
 MonoBehaviour:
   m_ObjectHideFlags: 0

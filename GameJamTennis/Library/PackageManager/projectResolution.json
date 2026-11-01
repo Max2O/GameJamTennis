@@ -9,6 +9,16 @@
     "C:\\Program Files\\Unity\\Hub\\Editor\\6000.3.10f1\\Editor\\Data\\Resources\\PackageManager\\BuiltInPackages\\BuiltInPackagesCombined.sha1"
   ],
   "outputs": {
+    "com.unity.2d.sprite@1.0.0": {
+      "name": "com.unity.2d.sprite",
+      "displayName": "2D Sprite",
+      "resolvedPath": "C:\\Users\\konst\\Documents\\GameJamTennis\\GameJamTennis\\Library\\PackageCache\\com.unity.2d.sprite@d14b9d497a24",
+      "fingerprint": "d14b9d497a24d5fc6a731faaacfb216ac084478e",
+      "editorCompatibility": "2019.2.0a1",
+      "version": "1.0.0",
+      "source": "builtin",
+      "testable": false
+    },
     "com.unity.inputsystem@1.18.0": {
       "name": "com.unity.inputsystem",
       "displayName": "Input System",
@@ -39,16 +49,6 @@
       "source": "builtin",
       "testable": false
     },
-    "com.unity.ugui@2.0.0": {
-      "name": "com.unity.ugui",
-      "displayName": "uGUI",
-      "resolvedPath": "C:\\Users\\konst\\Documents\\GameJamTennis\\GameJamTennis\\Library\\PackageCache\\com.unity.ugui@bb329a87fcdc",
-      "fingerprint": "bb329a87fcdc5d55e815f3d804764d676674047e",
-      "editorCompatibility": "2019.2.0a1",
-      "version": "2.0.0",
-      "source": "builtin",
-      "testable": false
-    },
     "com.unity.timeline@1.8.10": {
       "name": "com.unity.timeline",
       "displayName": "Timeline",
@@ -57,6 +57,16 @@
       "editorCompatibility": "2022.3.0a1",
       "version": "1.8.10",
       "source": "registry",
+      "testable": false
+    },
+    "com.unity.ugui@2.0.0": {
+      "name": "com.unity.ugui",
+      "displayName": "uGUI",
+      "resolvedPath": "C:\\Users\\konst\\Documents\\GameJamTennis\\GameJamTennis\\Library\\PackageCache\\com.unity.ugui@bb329a87fcdc",
+      "fingerprint": "bb329a87fcdc5d55e815f3d804764d676674047e",
+      "editorCompatibility": "2019.2.0a1",
+      "version": "2.0.0",
+      "source": "builtin",
       "testable": false
     },
     "com.unity.modules.accessibility@1.0.0": {
