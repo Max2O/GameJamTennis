@@ -8,7 +8,9 @@ public class EnemyBounceBack : MonoBehaviour
     public GameObject ball;
     [Tooltip("Net collider; the first arc will clear its top.")]
     public Collider net;
-    public float baseLaunchSpeed = 1.0f;
+    [Header("Enemy Attack Settings")]
+    [Tooltip("1 = same speed as the player's calculated shots.")]
+    [SerializeField] private float attackSpeedMultiplier = 1.0f;
     public float minimumArcHeight = 0.1f;
 
     private bool hasReturnedBall;
@@ -35,7 +37,9 @@ public class EnemyBounceBack : MonoBehaviour
             : null;
         Collider ballCollider = ball.GetComponent<Collider>();
 
-        if (bouncebackPercent <= 0.0f || baseLaunchSpeed <= 0.0f || minimumArcHeight < 0.0f)
+        if (bouncebackPercent <= 0.0f ||
+            attackSpeedMultiplier <= 0.0f ||
+            minimumArcHeight < 0.0f)
         {
             Debug.LogError("EnemyBounceBack has invalid launch settings.", this);
             return;
@@ -77,11 +81,10 @@ public class EnemyBounceBack : MonoBehaviour
             net,
             landingPoint,
             playerTarget,
-            baseLaunchSpeed * bouncebackPercent / 100.0f,
+            attackSpeedMultiplier * bouncebackPercent / 100.0f,
             minimumArcHeight,
             ballRadius,
             ballCollider);
-        ball.GetComponent<NetFault>().BeginEnemyShot();
     }
 
     private void OnTriggerExit(Collider other)

@@ -70,15 +70,41 @@ public class PlayerShot : MonoBehaviour
         remainingBoomerangReturns = cardEffectManager != null
             ? cardEffectManager.BoomerangStacks
             : 0;
-
-        Debug.Log(
-            "LaunchShot called. PlayerShot: " + GetInstanceID() +
-            ", Card manager: " +
-            (cardEffectManager != null ? cardEffectManager.GetInstanceID().ToString() : "NULL") +
-            ", Boomerang stacks: " +
-            (cardEffectManager != null ? cardEffectManager.BoomerangStacks.ToString() : "N/A")
-        );
         return LaunchVelocityToward(target);
+    }
+
+    public bool TryCalculatePreview(
+        Vector3 start,
+        Vector3 target,
+        float speedMultiplier,
+        out Vector3 velocity,
+        out float flightTime)
+    {
+        velocity = Vector3.zero;
+        flightTime = 0f;
+
+        if (speedMultiplier <= 0f)
+            return false;
+
+        if (!TryCalculateShot(
+            start,
+            target,
+            out Vector3 baseVelocity,
+            out float baseFlightTime))
+        {
+            return false;
+        }
+
+        // Faster shots have shorter flight times.
+        flightTime = baseFlightTime / speedMultiplier;
+
+        // Recalculate the velocity needed to reach the same destination.
+        Vector3 gravity = Physics.gravity;
+
+        velocity = (target - start) / flightTime
+            - 0.5f * gravity * flightTime;
+
+        return true;
     }
 
     // Replays the previous target without resetting remaining Boomerang charges.
@@ -112,9 +138,6 @@ public class PlayerShot : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Boomerang charges: " + remainingBoomerangReturns);
-        Debug.Log("Boomerang table collider: " +
-            (tableCollider != null ? tableCollider.name : "NOT ASSIGNED"));
         if (!isOutgoingPlayerShot || remainingBoomerangReturns <= 0)
             return;
 
@@ -128,7 +151,6 @@ public class PlayerShot : MonoBehaviour
         // Consume exactly one charge for this player-shot table collision.
         remainingBoomerangReturns--;
         isOutgoingPlayerShot = false;
-        Debug.Log("Boomerang activated! Remaining before consumption: " + remainingBoomerangReturns);
 
         EnemyReturnTrajectory trajectory =
             GetComponent<EnemyReturnTrajectory>();

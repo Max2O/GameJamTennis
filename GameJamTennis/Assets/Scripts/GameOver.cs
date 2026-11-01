@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,64 +15,47 @@ public class GameOver : MonoBehaviour
     [Header("Card Effects")]
     [SerializeField] private CardEffectManager cardEffectManager;
 
-    private bool trackingPlayerShot;
-    private bool playerShotReachedEnemySide;
-
-    public void BeginPlayerShot()
+    public enum TableSide
     {
-        trackingPlayerShot = true;
-        playerShotReachedEnemySide = false;
+        None,
+        Player,
+        Enemy
     }
 
-    public void PlayerShotReachedEnemySide()
+    private TableSide lastTouchedSide = TableSide.None;
+
+    public void RecordTableTouch(bool playerSide)
     {
-        if (trackingPlayerShot)
-        {
-            playerShotReachedEnemySide = true;
-        }
+        lastTouchedSide = playerSide
+            ? TableSide.Player
+            : TableSide.Enemy;
     }
 
-    void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (collision.collider != ball)
+        if (ball == null || collision.collider != ball)
             return;
-
-        // Determine the outcome of the player's shot.
-        if (trackingPlayerShot)
-        {
-            PlayersFault = !playerShotReachedEnemySide;
-            trackingPlayerShot = false;
-        }
 
         GameOverFunc();
     }
 
     public void GameOverFunc()
     {
-        // Remove all card modifiers.
+        // The player loses if the ball last touched their half.
+        PlayersFault = lastTouchedSide == TableSide.Player;
+
         if (cardEffectManager != null)
-        {
             cardEffectManager.ClearAllEffects();
-        }
-        else
-        {
-            Debug.LogWarning("GameOver: CardEffectManager reference is missing.", this);
-        }
 
         Time.timeScale = 0f;
         GameOverUI.SetActive(true);
-
-        if (PlayersFault)
-            WinLossImg.sprite = Defeat;
-        else
-            WinLossImg.sprite = Victory;
+        WinLossImg.sprite = PlayersFault ? Defeat : Victory;
     }
 
     public void ResetGameOver()
     {
         PlayersFault = false;
-        trackingPlayerShot = false;
-        playerShotReachedEnemySide = false;
+        lastTouchedSide = TableSide.None;
         GameOverUI.SetActive(false);
     }
 }

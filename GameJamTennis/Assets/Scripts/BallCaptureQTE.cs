@@ -104,7 +104,6 @@ public class BallCaptureQTE : MonoBehaviour
 
         if (incomingBall == null)
         {
-            Debug.LogError("Boomerang QTE: Returning ball has no Rigidbody!", this);
             return;
         }
 
@@ -153,7 +152,7 @@ public class BallCaptureQTE : MonoBehaviour
             Time.timeScale = 1f;
 
             if (gameOver != null)
-                gameOver.PlayersFault = true;
+                gameOver.GameOverFunc();
         }
     }
 
@@ -185,7 +184,6 @@ public class BallCaptureQTE : MonoBehaviour
                 attackManager.ReplayPreviousShot(ball);
             else
             {
-                Debug.LogError("AttackManager is not assigned!");
                 Time.timeScale = 1f;
             }
 
@@ -198,7 +196,6 @@ public class BallCaptureQTE : MonoBehaviour
         }
         else
         {
-            Debug.LogError("AttackManager is not assigned!");
             Time.timeScale = 1f;
         }
     }

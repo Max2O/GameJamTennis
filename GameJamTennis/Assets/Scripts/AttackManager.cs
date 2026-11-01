@@ -70,10 +70,8 @@ public class AttackManager : MonoBehaviour
     private bool hasValidTarget;
 
     private PlayerShot playerShot;
-    private bool shotConfirmed;
 
-    private void Awake()
-    {
+    private void Awake(){
         if (mainCamera == null)
             mainCamera = Camera.main;
 
@@ -88,8 +86,7 @@ public class AttackManager : MonoBehaviour
         trajectoryLine.useWorldSpace = true;
     }
 
-    public void BeginAiming(Transform receivedBall)
-    {
+    public void BeginAiming(Transform receivedBall){
         if (state != AttackState.Inactive || receivedBall == null)
             return;
 
@@ -97,16 +94,13 @@ public class AttackManager : MonoBehaviour
 
         playerShot = ball.GetComponent<PlayerShot>();
 
-        if (playerShot == null)
-        {
-            Debug.LogError("The ball is missing its PlayerShot component!");
+        if (playerShot == null){
             return;
         }
 
         shotTimedOut = false;
         aimTimeRemaining = 0f;
 
-        shotConfirmed = false;
 
         Time.timeScale = 0f;
 
@@ -128,10 +122,8 @@ public class AttackManager : MonoBehaviour
         IsAiming = true;
     }
 
-    private void Update()
-    {
-        switch (state)
-        {
+    private void Update(){
+        switch (state){
             case AttackState.MovingToAim:
             case AttackState.MovingBack:
                 UpdateCameraTransition();
@@ -146,8 +138,7 @@ public class AttackManager : MonoBehaviour
     private void StartCameraTransition(
         Vector3 destinationPosition,
         Quaternion destinationRotation,
-        AttackState transitionState)
-    {
+        AttackState transitionState){
         cameraStartPosition = mainCamera.transform.position;
         cameraStartRotation = mainCamera.transform.rotation;
 
@@ -158,8 +149,7 @@ public class AttackManager : MonoBehaviour
         state = transitionState;
     }
 
-    private void UpdateCameraTransition()
-    {
+    private void UpdateCameraTransition(){
         transitionTimer += Time.unscaledDeltaTime;
 
         float progress = Mathf.Clamp01(
@@ -181,68 +171,54 @@ public class AttackManager : MonoBehaviour
             smoothProgress
         );
 
-        if (progress >= 1f)
-        {
-            if (state == AttackState.MovingToAim)
-            {
+        if (progress >= 1f){
+            if (state == AttackState.MovingToAim){
                 state = AttackState.Aiming;
 
-                if (firstAimingPhase)
-                {
+                if (firstAimingPhase){
                     aimTimeRemaining = Mathf.Infinity;
                     firstAimingPhase = false;
-                }
-                else
-                {
+                }else{
                     aimTimeRemaining = aimTimeLimit;
                 }
 
                 aimTimerUI.SetActive(true);
                 UpdateAimTimerUI();
             }
-            else if (state == AttackState.MovingBack)
-            {
+            else if (state == AttackState.MovingBack){
                 FinishAiming();
             }
         }
     }
 
-    private void UpdateAiming()
-    {
+    private void UpdateAiming(){
         UpdateTargeting();
 
-        if (hasValidTarget && Input.GetMouseButtonDown(0))
-        {
+        if (hasValidTarget && Input.GetMouseButtonDown(0)){
             ConfirmTarget();
             return;
         }
 
-        if (!float.IsInfinity(aimTimeRemaining))
-        {
+        if (!float.IsInfinity(aimTimeRemaining)){
             aimTimeRemaining -= Time.unscaledDeltaTime;
 
             UpdateAimTimerUI();
 
-            if (aimTimeRemaining <= 0f)
-            {
+            if (aimTimeRemaining <= 0f){
                 TimeoutShot();
             }
         }
     }
 
-    private void TimeoutShot()
-    {
+    private void TimeoutShot(){
         if (state != AttackState.Aiming)
             return;
 
-        if (netCollider == null)
-        {
-            Debug.LogError("AttackManager: No net collider assigned!");
+        if (netCollider == null){
             return;
         }
 
         shotTimedOut = true;
-        shotConfirmed = false;
 
         timeoutTarget = GetRandomNetTarget();
 
@@ -256,10 +232,8 @@ public class AttackManager : MonoBehaviour
         );
     }
 
-    private void UpdateAimTimerUI()
-    {
-        if (float.IsInfinity(aimTimeRemaining))
-        {
+    private void UpdateAimTimerUI(){
+        if (float.IsInfinity(aimTimeRemaining)){
             aimTimerSlider.value = 1f;
             aimTimerText.text = "∞";
             return;
@@ -273,8 +247,7 @@ public class AttackManager : MonoBehaviour
         aimTimerText.text = Mathf.Max(0f, aimTimeRemaining).ToString("F1") + "s";
     }
 
-    private Vector3 GetRandomNetTarget()
-    {
+    private Vector3 GetRandomNetTarget(){
         Bounds bounds = netCollider.bounds;
 
         // Find the thinnest world-space axis of the net.
@@ -290,8 +263,7 @@ public class AttackManager : MonoBehaviour
         Vector3 randomOffset = Vector3.zero;
 
         // Randomize along the two broad axes, but only slightly.
-        for (int axis = 0; axis < 3; axis++)
-        {
+        for (int axis = 0; axis < 3; axis++){
             if (axis == thinAxis)
                 continue;
 
@@ -310,8 +282,7 @@ public class AttackManager : MonoBehaviour
         return target;
     }
 
-    private void UpdateTargeting()
-    {
+    private void UpdateTargeting(){
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
         if (Physics.Raycast(
@@ -334,23 +305,19 @@ public class AttackManager : MonoBehaviour
 
             aimMarker.position = selectedTarget;
             aimMarker.gameObject.SetActive(hasValidTarget);
-        }
-        else
-        {
+        }else{
             hasValidTarget = false;
             aimMarker.gameObject.SetActive(false);
             trajectoryLine.enabled = false;
         }
     }
 
-    private bool UpdateTrajectory()
-    {
+    private bool UpdateTrajectory(){
         if (!playerShot.TryCalculatePreview(
             ball.position,
             selectedTarget,
             out Vector3 velocity,
-            out float flightTime))
-        {
+            out float flightTime)){
             trajectoryLine.enabled = false;
             return false;
         }
@@ -360,8 +327,7 @@ public class AttackManager : MonoBehaviour
         trajectoryLine.positionCount = count;
         trajectoryLine.enabled = true;
 
-        for (int i = 0; i < count; i++)
-        {
+        for (int i = 0; i < count; i++){
             float progress = (float)i / (count - 1);
             float elapsedTime = flightTime * progress;
 
@@ -377,10 +343,7 @@ public class AttackManager : MonoBehaviour
         return true;
     }
 
-    private void ConfirmTarget()
-    {
-        shotConfirmed = true;
-
+    private void ConfirmTarget(){
         originalShotTarget = selectedTarget;
         hasOriginalShotTarget = true;
 
@@ -391,25 +354,18 @@ public class AttackManager : MonoBehaviour
         );
     }
 
-    public void ReplayPreviousShot(Transform returningBall)
-    {
-        if (returningBall == null)
-        {
-            Debug.LogError("Boomerang replay: Ball reference is missing!", this);
+    public void ReplayPreviousShot(Transform returningBall){
+        if (returningBall == null){
             Time.timeScale = 1f;
             return;
         }
 
-        if (!hasOriginalShotTarget)
-        {
-            Debug.LogError("Boomerang replay: No original shot target has been saved!", this);
+        if (!hasOriginalShotTarget){
             Time.timeScale = 1f;
             return;
         }
 
-        if (state != AttackState.Inactive)
-        {
-            Debug.LogWarning("Boomerang replay attempted while AttackManager is busy.", this);
+        if (state != AttackState.Inactive){
             Time.timeScale = 1f;
             return;
         }
@@ -417,9 +373,7 @@ public class AttackManager : MonoBehaviour
         ball = returningBall;
         playerShot = ball.GetComponent<PlayerShot>();
 
-        if (playerShot == null)
-        {
-            Debug.LogError("Boomerang replay: Ball is missing PlayerShot!", this);
+        if (playerShot == null){
             Time.timeScale = 1f;
             return;
         }
@@ -427,14 +381,8 @@ public class AttackManager : MonoBehaviour
         // Resume physics and launch toward the original target.
         Time.timeScale = 1f;
 
-        if (playerShot.LaunchShot(originalShotTarget))
-        {
+        if (playerShot.LaunchShot(originalShotTarget)){
             NetFault netFault = ball.GetComponent<NetFault>();
-
-            if (netFault != null)
-                netFault.BeginPlayerShot();
-            else
-                Debug.LogWarning("Boomerang replay: Ball has no NetFault component!", this);
         }
     }
 
@@ -445,7 +393,7 @@ public class AttackManager : MonoBehaviour
         Cursor.visible = true;
         aimTimerUI.SetActive(false);
 
-        // Resume physics before applying the timeout impulse.
+        // Resume physics before launching the ball.
         Time.timeScale = 1f;
 
         if (shotTimedOut)
@@ -454,26 +402,34 @@ public class AttackManager : MonoBehaviour
 
             if (ballBody != null)
             {
-                Vector3 direction = (timeoutTarget - ball.position).normalized;
+                Vector3 direction =
+                    (timeoutTarget - ball.position).normalized;
 
                 ballBody.linearVelocity = Vector3.zero;
                 ballBody.angularVelocity = Vector3.zero;
 
-                // Give the ball a controlled velocity toward the net.
                 ballBody.AddForce(
                     direction * timeoutShotSpeed * ballBody.mass,
                     ForceMode.Impulse
                 );
             }
         }
-        else if (shotConfirmed)
+        else
         {
-            if (playerShot.ReplayShot(originalShotTarget))
-            ball.GetComponent<NetFault>().BeginPlayerShot();
+            // Launch toward the player's selected landing point.
+            if (playerShot != null)
+            {
+                bool launched = playerShot.LaunchShot(selectedTarget);
+
+                if (!launched)
+                    Debug.LogError("Player shot failed to launch!", this);
+            }
         }
 
         state = AttackState.Inactive;
         IsAiming = false;
-        cardSelectionManager.RegisterPlayerHit();
+
+        if (cardSelectionManager != null)
+            cardSelectionManager.RegisterPlayerHit();
     }
 }

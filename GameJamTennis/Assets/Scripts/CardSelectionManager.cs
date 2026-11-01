@@ -47,7 +47,6 @@ public class CardSelectionManager : MonoBehaviour
     {
         if (availableCards.Count < cardSlots.Length)
         {
-            Debug.LogWarning("CardSelectionManager: You need at least 3 cards in the card database.");
             return;
         }
 

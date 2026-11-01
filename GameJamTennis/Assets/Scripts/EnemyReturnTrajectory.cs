@@ -59,19 +59,67 @@ public class EnemyReturnTrajectory : MonoBehaviour
         }
     }
 
+    
     private void OnCollisionEnter(Collision collision)
     {
         if (currentLeg != FlightLeg.ToTable || collision.collider != tableArea)
-        {
             return;
-        }
 
         currentLeg = FlightLeg.ToPlayer;
+
         float reboundSpeed = CalculateReboundSpeed(collision);
-        if (reboundSpeed <= Mathf.Epsilon || !TryLaunch(playerTarget, reboundSpeed))
+
+        if (reboundSpeed <= Mathf.Epsilon ||
+            !TryLaunchAtSpeed(playerTarget, reboundSpeed))
         {
             currentLeg = FlightLeg.Complete;
         }
+    }
+
+    private bool TryLaunchAtSpeed(Vector3 destination, float speed)
+    {
+        if (ballBody == null || speed <= Mathf.Epsilon)
+            return false;
+
+        Vector3 start = ballBody.position;
+        Vector3 gravity = Physics.gravity;
+        float downwardGravity = -gravity.y;
+
+        if (downwardGravity <= 0.001f)
+            return false;
+
+        float horizontalDistance = Vector2.Distance(
+            new Vector2(start.x, start.z),
+            new Vector2(destination.x, destination.z)
+        );
+
+        float duration = horizontalDistance / speed;
+
+        duration = Mathf.Max(
+            duration,
+            Mathf.Sqrt(8f * minimumArcHeight / downwardGravity)
+        );
+
+        duration = Mathf.Max(
+            duration,
+            GetNetClearanceDuration(start, destination, downwardGravity)
+        );
+
+        duration = Mathf.Max(duration, 0.02f);
+
+        Vector3 velocity =
+            (destination - start) / duration -
+            0.5f * gravity * duration;
+
+        if (playerShot != null)
+        {
+            velocity.x -= 0.5f * playerShot.GravityBend * duration;
+        }
+
+        ballBody.linearVelocity = velocity;
+        ballBody.angularVelocity = Vector3.zero;
+
+        return true;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -90,8 +138,6 @@ public class EnemyReturnTrajectory : MonoBehaviour
 
                 if (boomerangQTE != null)
                     boomerangQTE.BeginBoomerangQTE(transform);
-                else
-                    Debug.LogError("Boomerang return has no QTE reference!", this);
             }
         }
     }
@@ -132,39 +178,37 @@ public class EnemyReturnTrajectory : MonoBehaviour
         if (!TryLaunch(playerTarget, launchSpeed))
         {
             currentLeg = FlightLeg.Complete;
-            Debug.LogError("Could not launch the Boomerang return.", this);
         }
     }
 
-    private bool TryLaunch(Vector3 destination, float speed)
+    private bool TryLaunch(Vector3 destination, float speedMultiplier)
     {
-        Vector3 gravity = Physics.gravity;
-        float downwardGravity = -gravity.y;
+        if (ballBody == null || playerShot == null)
+            return false;
 
-        Vector3 start = ballBody.position;
-        float horizontalDistance = Vector2.Distance(
-            new Vector2(start.x, start.z),
-            new Vector2(destination.x, destination.z));
-        float duration = horizontalDistance / speed;
-        duration = Mathf.Max(duration, Mathf.Sqrt(8.0f * minimumArcHeight / downwardGravity));
-        duration = Mathf.Max(duration, GetNetClearanceDuration(start, destination, downwardGravity));
-        duration = Mathf.Max(duration, 0.02f);
-
-        Vector3 initialVelocity =
-            (destination - start) / duration -
-            0.5f * gravity * duration;
-
-        // Compensate for sideways gravity so the curved trajectory
-        // still reaches the intended destination.
-        if (playerShot != null)
+        if (!playerShot.TryCalculatePreview(
+            ballBody.position,
+            destination,
+            speedMultiplier,
+            out Vector3 initialVelocity,
+            out float flightTime))
         {
-            float gravityBend = playerShot.GravityBend;
-
-            initialVelocity.x -=
-                0.5f * gravityBend * duration;
+            Debug.LogWarning(
+                "Could not calculate enemy shot trajectory.",
+                this
+            );
+            return false;
         }
 
+        // Apply the same sideways gravity compensation as player shots.
+        float gravityBend = playerShot.GravityBend;
+
+        initialVelocity.x -=
+            0.5f * gravityBend * flightTime;
+
         ballBody.linearVelocity = initialVelocity;
+        ballBody.angularVelocity = Vector3.zero;
+
         return true;
     }
 

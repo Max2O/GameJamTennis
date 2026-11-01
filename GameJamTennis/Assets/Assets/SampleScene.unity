@@ -2227,13 +2227,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6e64ca49887c884e8deb0510f0c269f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBounceBack
-  bouncebackPercent: 200
+  bouncebackPercent: 50
   playerHitbox: {fileID: 1888101114}
   ballCaptureQTE: {fileID: 1888101117}
   ball: {fileID: 4085996643442510468}
   net: {fileID: 7703866214700848406}
-  baseLaunchSpeed: 1
-  minimumArcHeight: 0.1
+  attackSpeedMultiplier: 2
+  minimumArcHeight: 10
   tableSurface: {fileID: 1071336940}
   playerSideTableArea: {fileID: 1575550751}
 --- !u!1 &1065975313
@@ -3058,12 +3058,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6e64ca49887c884e8deb0510f0c269f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBounceBack
-  bouncebackPercent: 200
+  bouncebackPercent: 100
   playerHitbox: {fileID: 1888101114}
   ballCaptureQTE: {fileID: 1888101117}
   ball: {fileID: 4085996643442510468}
   net: {fileID: 7703866214700848406}
-  baseLaunchSpeed: 1
+  attackSpeedMultiplier: 1
   minimumArcHeight: 0.1
   tableSurface: {fileID: 1071336940}
   playerSideTableArea: {fileID: 1575550751}
@@ -3269,8 +3269,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.014980466, y: 0.013525181, z: 0.0005878834}
-  m_Center: {x: -0.0024902353, y: 0.0017625911, z: -0.0004918115}
+  m_Size: {x: 0.014980466, y: 0.011194624, z: 0.00058788364}
+  m_Center: {x: -0.0024902353, y: 0.0020430782, z: -0.0004918124}
 --- !u!1 &1575763512
 GameObject:
   m_ObjectHideFlags: 0
@@ -4551,7 +4551,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: e65d5047e25a42c46a5894234db83cc1, type: 2}
     - target: {fileID: -8679921383154817045, guid: 442d31cc162e91d42841ec5b151b605b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1231.4
+      value: -1231.1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 442d31cc162e91d42841ec5b151b605b, type: 3}
       propertyPath: m_LocalPosition.y

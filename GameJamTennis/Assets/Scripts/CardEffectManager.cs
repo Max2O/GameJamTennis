@@ -55,7 +55,6 @@ public class CardEffectManager : MonoBehaviour
     {
         if (card == null)
         {
-            Debug.LogWarning("CardEffectManager received a null card.", this);
             return;
         }
 
@@ -67,13 +66,6 @@ public class CardEffectManager : MonoBehaviour
         };
 
         activeEffects.Add(newEffect);
-
-        Debug.Log(
-            "Card manager " + GetInstanceID() +
-            " now has " + BoomerangStacks + " Boomerang stacks."
-        );
-
-        Debug.Log("Applied card: " + card.effectType, this);
 
         RefreshEffects();
     }
