@@ -416,6 +416,7 @@ public class AttackManager : MonoBehaviour
         else if (shotConfirmed)
         {
             playerShot.LaunchShot(selectedTarget);
+            ball.GetComponent<NetFault>().BeginPlayerShot();
         }
 
         state = AttackState.Inactive;

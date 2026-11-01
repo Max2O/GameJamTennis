@@ -83,6 +83,11 @@ public class RoundStart : MonoBehaviour
             ballRigidbody.rotation = ballStartRotation;
         }
 
+        NetFault netFault = ball.GetComponent<NetFault>();
+
+        if (netFault != null)
+            netFault.ResetFault();
+
         // Reset the trajectory state.
         enemyReturnTrajectory = ball.GetComponent<EnemyReturnTrajectory>();
 

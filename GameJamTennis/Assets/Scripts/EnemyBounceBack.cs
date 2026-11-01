@@ -81,6 +81,7 @@ public class EnemyBounceBack : MonoBehaviour
             minimumArcHeight,
             ballRadius,
             ballCollider);
+        ball.GetComponent<NetFault>().BeginEnemyShot();
     }
 
     private void OnTriggerExit(Collider other)

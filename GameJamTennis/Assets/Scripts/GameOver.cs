@@ -14,15 +14,20 @@ public class GameOver : MonoBehaviour
 
     void OnCollisionEnter(Collision collision){
         if(collision.collider == ball){
-            Time.timeScale = 0f;
-            GameOverUI.SetActive(true);
-            if(PlayersFault){
-                WinLossImg.sprite = Defeat;
-            }
-            else
-            {
-                WinLossImg.sprite = Victory;
-            }
+            GameOverFunc();
+        }
+    }
+
+    public void GameOverFunc()
+    {
+        Time.timeScale = 0f;
+        GameOverUI.SetActive(true);
+        if(PlayersFault){
+            WinLossImg.sprite = Defeat;
+        }
+        else
+        {
+            WinLossImg.sprite = Victory;
         }
     }
 }
