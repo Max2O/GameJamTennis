@@ -20,7 +20,10 @@ public class EnemyReturnTrajectory : MonoBehaviour
     private float minimumArcHeight;
     private float ballRadius;
     private FlightLeg currentLeg;
+    private bool isBoomerangReturn;
+    private BallCaptureQTE boomerangQTE;
     public bool IsHeadingToPlayer => currentLeg == FlightLeg.ToPlayer;
+    private PlayerShot playerShot;
 
     public void Begin(
         Rigidbody body,
@@ -44,6 +47,7 @@ public class EnemyReturnTrajectory : MonoBehaviour
         launchSpeed = speed;
         minimumArcHeight = arcHeight;
         ballRadius = radius;
+        playerShot = body.GetComponent<PlayerShot>();
 
         ballBody.linearVelocity = Vector3.zero;
         ballBody.angularVelocity = Vector3.zero;
@@ -79,6 +83,56 @@ public class EnemyReturnTrajectory : MonoBehaviour
             other.transform.IsChildOf(playerHitbox.transform))
         {
             currentLeg = FlightLeg.Complete;
+
+            if (isBoomerangReturn)
+            {
+                isBoomerangReturn = false;
+
+                if (boomerangQTE != null)
+                    boomerangQTE.BeginBoomerangQTE(transform);
+                else
+                    Debug.LogError("Boomerang return has no QTE reference!", this);
+            }
+        }
+    }
+
+    public void BeginBoomerangReturn(
+        Rigidbody body,
+        Collider player,
+        Collider netCollider,
+        float speed,
+        float arcHeight,
+        float radius,
+        BallCaptureQTE qte)
+    {
+        if (body == null || player == null)
+        {
+            Debug.LogError("Boomerang return is missing its ball or player hitbox!", this);
+            return;
+        }
+
+        ballBody = body;
+        playerHitbox = player;
+        net = netCollider;
+        ballCollider = body.GetComponent<Collider>();
+
+        ballRadius = radius;
+        launchSpeed = speed;
+        minimumArcHeight = arcHeight;
+
+        playerTarget = player.bounds.center;
+        boomerangQTE = qte;
+
+        isBoomerangReturn = true;
+        currentLeg = FlightLeg.ToPlayer;
+
+        ballBody.linearVelocity = Vector3.zero;
+        ballBody.angularVelocity = Vector3.zero;
+
+        if (!TryLaunch(playerTarget, launchSpeed))
+        {
+            currentLeg = FlightLeg.Complete;
+            Debug.LogError("Could not launch the Boomerang return.", this);
         }
     }
 
@@ -96,7 +150,21 @@ public class EnemyReturnTrajectory : MonoBehaviour
         duration = Mathf.Max(duration, GetNetClearanceDuration(start, destination, downwardGravity));
         duration = Mathf.Max(duration, 0.02f);
 
-        ballBody.linearVelocity = (destination - start) / duration - 0.5f * gravity * duration;
+        Vector3 initialVelocity =
+            (destination - start) / duration -
+            0.5f * gravity * duration;
+
+        // Compensate for sideways gravity so the curved trajectory
+        // still reaches the intended destination.
+        if (playerShot != null)
+        {
+            float gravityBend = playerShot.GravityBend;
+
+            initialVelocity.x -=
+                0.5f * gravityBend * duration;
+        }
+
+        ballBody.linearVelocity = initialVelocity;
         return true;
     }
 

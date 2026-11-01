@@ -5,59 +5,89 @@ using UnityEngine;
 public class PlayerShot : MonoBehaviour
 {
     [Header("Base Shot Settings")]
-
     [Tooltip("Ball height at which it starts receiving height-based power.")]
     [SerializeField] private float lowBallHeight = 0.15f;
-
     [Tooltip("Ball height at which it receives maximum height-based power.")]
     [SerializeField] private float highBallHeight = 0.8f;
-
     [Tooltip("Maximum horizontal distance used for distance normalization.")]
     [SerializeField] private float maximumShotDistance = 2.0f;
 
     [Header("Vertical Arc Heights")]
-
-    [Tooltip("Maximum downward displacement for a high, close smash.")]
     [SerializeField] private float maximumSmashDrop = 0.5f;
-
-    [Tooltip("Maximum height above the starting position for a low, distant lob.")]
     [SerializeField] private float maximumLobHeight = 1.5f;
 
     [Header("Shot Behaviour")]
-
     [Range(0f, 1f)]
     [SerializeField] private float heightArcWeight = 0.65f;
-
     [Range(0f, 1f)]
     [SerializeField] private float distanceArcWeight = 0.35f;
 
     [Header("Height Reference")]
     [SerializeField] private float tableHeight = -65f;
 
+    [Header("Boomerang")]
+    [SerializeField] private CardEffectManager cardEffectManager;
+    [SerializeField] private Collider tableCollider;
+    [SerializeField] private Collider playerHitbox;
+    [SerializeField] private Collider netCollider;
+    [SerializeField] private BallCaptureQTE ballCaptureQTE;
+    [SerializeField] private float boomerangReturnSpeed = 5f;
+    [SerializeField] private float boomerangReturnArcHeight = 0.5f;
+
+    private float gravityBend;
+    public float GravityBend => gravityBend;
+
     private Rigidbody ballBody;
+    private bool ballMirrorActive;
+
+    private int remainingBoomerangReturns;
+    private bool isOutgoingPlayerShot;
+
+    public int RemainingBoomerangReturns => remainingBoomerangReturns;
+
+    public void SetBallMirrorActive(bool active)
+    {
+        ballMirrorActive = active;
+    }
 
     private void Awake()
     {
         ballBody = GetComponent<Rigidbody>();
     }
 
-    // Calculates the base-stat shot used by the trajectory preview.
     public bool TryCalculatePreview(
         Vector3 start,
         Vector3 target,
         out Vector3 velocity,
         out float flightTime)
     {
-        return TryCalculateShot(
-            start,
-            target,
-            out velocity,
-            out flightTime
-        );
+        return TryCalculateShot(start, target, out velocity, out flightTime);
     }
 
-    // Calculates and launches the actual shot.
+    // Starts a completely new player shot and initializes its Boomerang charges.
     public bool LaunchShot(Vector3 target)
+    {
+        remainingBoomerangReturns = cardEffectManager != null
+            ? cardEffectManager.BoomerangStacks
+            : 0;
+
+        Debug.Log(
+            "LaunchShot called. PlayerShot: " + GetInstanceID() +
+            ", Card manager: " +
+            (cardEffectManager != null ? cardEffectManager.GetInstanceID().ToString() : "NULL") +
+            ", Boomerang stacks: " +
+            (cardEffectManager != null ? cardEffectManager.BoomerangStacks.ToString() : "N/A")
+        );
+        return LaunchVelocityToward(target);
+    }
+
+    // Replays the previous target without resetting remaining Boomerang charges.
+    public bool ReplayShot(Vector3 target)
+    {
+        return LaunchVelocityToward(target);
+    }
+
+    private bool LaunchVelocityToward(Vector3 target)
     {
         if (!TryCalculateShot(
             ballBody.position,
@@ -66,13 +96,73 @@ public class PlayerShot : MonoBehaviour
             out float flightTime))
         {
             Debug.LogWarning("Could not calculate a valid shot.", this);
+            isOutgoingPlayerShot = false;
             return false;
         }
+
+        if (ballMirrorActive)
+            velocity.x = -velocity.x;
 
         ballBody.linearVelocity = velocity;
         ballBody.angularVelocity = Vector3.zero;
 
+        isOutgoingPlayerShot = true;
         return true;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("Boomerang charges: " + remainingBoomerangReturns);
+        Debug.Log("Boomerang table collider: " +
+            (tableCollider != null ? tableCollider.name : "NOT ASSIGNED"));
+        if (!isOutgoingPlayerShot || remainingBoomerangReturns <= 0)
+            return;
+
+        if (tableCollider == null)
+            return;
+
+        if (collision.collider != tableCollider &&
+            !collision.collider.transform.IsChildOf(tableCollider.transform))
+            return;
+
+        // Consume exactly one charge for this player-shot table collision.
+        remainingBoomerangReturns--;
+        isOutgoingPlayerShot = false;
+        Debug.Log("Boomerang activated! Remaining before consumption: " + remainingBoomerangReturns);
+
+        EnemyReturnTrajectory trajectory =
+            GetComponent<EnemyReturnTrajectory>();
+
+        if (trajectory == null)
+            trajectory = gameObject.AddComponent<EnemyReturnTrajectory>();
+
+        float ballRadius = GetComponent<Collider>() != null
+            ? GetComponent<Collider>().bounds.extents.magnitude
+            : 0.1f;
+
+        trajectory.BeginBoomerangReturn(
+            ballBody,
+            playerHitbox,
+            netCollider,
+            boomerangReturnSpeed,
+            boomerangReturnArcHeight,
+            ballRadius,
+            ballCaptureQTE
+        );
+    }
+
+    private void FixedUpdate()
+    {
+        if (Mathf.Abs(gravityBend) < 0.001f)
+            return;
+
+        if (ballBody.position.y <= tableHeight + 0.05f)
+            return;
+
+        ballBody.AddForce(
+            Vector3.right * gravityBend,
+            ForceMode.Acceleration
+        );
     }
 
     private bool TryCalculateShot(
@@ -85,66 +175,34 @@ public class PlayerShot : MonoBehaviour
         flightTime = 0f;
 
         float gravity = -Physics.gravity.y;
-
         if (gravity <= 0.001f)
             return false;
 
-        // Horizontal distance across the table.
         float distance = Vector2.Distance(
             new Vector2(start.x, start.z),
-            new Vector2(target.x, target.z)
-        );
+            new Vector2(target.x, target.z));
 
-        // How high the ball is above its intended landing position.
         float ballHeight = start.y - tableHeight;
 
-        // Higher balls produce a stronger downward shot.
-        // Lower balls produce a weaker, higher-arching shot.
         float heightFactor = Mathf.InverseLerp(
-            lowBallHeight,
-            highBallHeight,
-            ballHeight
-        );
+            lowBallHeight, highBallHeight, ballHeight);
 
-        // Normalize the shot distance.
         float distanceFactor = Mathf.InverseLerp(
-            0.25f,
-            maximumShotDistance,
-            distance
-        );
+            0.25f, maximumShotDistance, distance);
 
-        // Distance affects the arc only when the ball is low.
-        // The higher the ball, the less distance affects its arc.
         float arcFactor =
             (1f - heightFactor) *
             (heightArcWeight + distanceFactor * distanceArcWeight);
 
         arcFactor = Mathf.Clamp01(arcFactor);
 
-        // Calculate the desired peak height relative to the starting position.
         float desiredPeakHeight = Mathf.Lerp(
-            -maximumSmashDrop,
-            maximumLobHeight,
-            arcFactor
-        );
+            -maximumSmashDrop, maximumLobHeight, arcFactor);
 
-        // Calculate vertical launch velocity from the desired peak height.
-        float verticalVelocity;
+        float verticalVelocity = desiredPeakHeight > 0f
+            ? Mathf.Sqrt(2f * gravity * desiredPeakHeight)
+            : -Mathf.Sqrt(2f * gravity * -desiredPeakHeight);
 
-        if (desiredPeakHeight > 0f)
-        {
-            verticalVelocity = Mathf.Sqrt(
-                2f * gravity * desiredPeakHeight
-            );
-        }
-        else
-        {
-            verticalVelocity = -Mathf.Sqrt(
-                2f * gravity * -desiredPeakHeight
-            );
-        }
-
-        // Solve for the descending arrival time.
         float verticalDifference = target.y - start.y;
 
         float discriminant =
@@ -158,46 +216,29 @@ public class PlayerShot : MonoBehaviour
             verticalVelocity + Mathf.Sqrt(discriminant)
         ) / gravity;
 
-        Debug.Log(
-            $"START Y: {start.y:F3} | " +
-            $"TARGET Y: {target.y:F3} | " +
-            $"BALL HEIGHT: {ballHeight:F3} | " +
-            $"HEIGHT FACTOR: {heightFactor:F3} | " +
-            $"DISTANCE FACTOR: {distanceFactor:F3} | " +
-            $"ARC FACTOR: {arcFactor:F3} | " +
-            $"PEAK HEIGHT: {desiredPeakHeight:F3} | " +
-            $"VERTICAL SPEED: {verticalVelocity:F3} | " +
-            $"FLIGHT TIME: {flightTime:F3}"
-        );
-
         if (flightTime <= 0.001f)
             return false;
 
-        // Calculate the horizontal velocity needed to reach the target.
         Vector3 horizontalDifference = new Vector3(
-            target.x - start.x,
-            0f,
-            target.z - start.z
-        );
+            target.x - start.x, 0f, target.z - start.z);
 
-        Vector3 horizontalVelocity =
-            horizontalDifference / flightTime;
-
-        velocity = horizontalVelocity +
+        velocity = horizontalDifference / flightTime +
                    Vector3.up * verticalVelocity;
 
         return true;
     }
 
-    // Evaluates the same projectile equation used by the Rigidbody.
     public Vector3 EvaluateTrajectory(
         Vector3 start,
         Vector3 initialVelocity,
         float elapsedTime)
     {
-        return start +
-               initialVelocity * elapsedTime +
-               0.5f * Physics.gravity *
-               elapsedTime * elapsedTime;
+        return start + initialVelocity * elapsedTime +
+               0.5f * Physics.gravity * elapsedTime * elapsedTime;
+    }
+
+    public void SetGravityBend(float strength)
+    {
+        gravityBend = strength;
     }
 }

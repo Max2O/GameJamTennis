@@ -11,9 +11,19 @@ public enum CardEffectType
     Fog
 }
 
+public enum CardPersistence
+{
+    UntilNextSelection,
+    Permanent,
+    Timed
+}
+
 [CreateAssetMenu(fileName = "NewCard", menuName = "Table Tennis/Cards/Card")]
 public class CardData : ScriptableObject
 {
+    [Header("AI Difficulty")]
+    [Range(0f, 100f)]
+    public float aiMissChance = 1f;
     [Header("Card Information")]
     public string description;
     public Sprite artwork;
@@ -22,4 +32,7 @@ public class CardData : ScriptableObject
     public CardEffectType effectType;
     public float effectValue = 1f;
     public float duration = 0f;
+
+    [Header("Persistence")]
+    public CardPersistence persistence = CardPersistence.Permanent;
 }

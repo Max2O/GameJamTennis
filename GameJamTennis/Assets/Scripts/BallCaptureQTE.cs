@@ -1,3 +1,4 @@
+
 using TMPro;
 using UnityEngine;
 
@@ -5,12 +6,11 @@ public class BallCaptureQTE : MonoBehaviour
 {
     public float QTEtimer = 0.0f;
     public GameObject qteObject;
-    bool QTEstarted = false;
+    private bool QTEstarted = false;
     public bool shouldBegin = true;
 
     [SerializeField] private GameOver gameOver;
     [SerializeField] private AttackManager attackManager;
-    [Tooltip("Camera")]
     [SerializeField] private Camera mainCamera;
 
     [Tooltip("QTE UI stuff")]
@@ -26,7 +26,13 @@ public class BallCaptureQTE : MonoBehaviour
     [SerializeField] private float velocityDecay = 2f;
     [SerializeField] private float minimumQteDuration = 1f;
 
+    [Header("RamBall Modifier")]
+    [SerializeField] private CardEffectManager cardEffectManager;
+    [SerializeField] private float ramBallTimeBonusPerClick = 0.1f;
+
+    private int requiredClicksRemaining = 1;
     private bool isFirstQte = true;
+    private bool isBoomerangQTE = false;
 
     public void SetFirstQteDuration(float duration)
     {
@@ -54,11 +60,12 @@ public class BallCaptureQTE : MonoBehaviour
         return Mathf.Clamp(duration, minimumQteDuration, normalQteDuration);
     }
 
-    void Start(){
+    private void Start()
+    {
         qteObject.SetActive(false);
     }
 
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (!shouldBegin || QTEstarted)
             return;
@@ -69,7 +76,8 @@ public class BallCaptureQTE : MonoBehaviour
         EnemyReturnTrajectory trajectory =
             other.GetComponent<EnemyReturnTrajectory>();
 
-        // First QTE: player starts the game, so no enemy trajectory exists.
+        // The first QTE starts the game.
+        // Later normal QTEs require an enemy return trajectory.
         if (!isFirstQte)
         {
             if (trajectory == null || !trajectory.IsHeadingToPlayer)
@@ -81,7 +89,40 @@ public class BallCaptureQTE : MonoBehaviour
         if (incomingBall == null)
             return;
 
+        ball = incomingBall.transform;
+        StartQTE(incomingBall);
+    }
+
+    // Called by the Boomerang system when its return flight reaches the player.
+    // This deliberately bypasses the normal trigger-based QTE check.
+    public void BeginBoomerangQTE(Transform returningBall)
+    {
+        if (QTEstarted || returningBall == null)
+            return;
+
+        Rigidbody incomingBall = returningBall.GetComponent<Rigidbody>();
+
+        if (incomingBall == null)
+        {
+            Debug.LogError("Boomerang QTE: Returning ball has no Rigidbody!", this);
+            return;
+        }
+
+        ball = returningBall;
+        isBoomerangQTE = true;
+
+        StartQTE(incomingBall);
+    }
+
+    private void StartQTE(Rigidbody incomingBall)
+    {
         QTEtimer = CalculateQteDuration(incomingBall.linearVelocity.magnitude);
+
+        int ramBallStacks = cardEffectManager != null
+            ? cardEffectManager.RamBallStacks
+            : 0;
+
+        requiredClicksRemaining = 1 + ramBallStacks;
 
         UpdateIndicator();
 
@@ -90,17 +131,29 @@ public class BallCaptureQTE : MonoBehaviour
         Time.timeScale = 0f;
     }
 
-    void Update(){
-        if (QTEstarted){
-            if(timerText != null)timerText.text = QTEtimer.ToString("F1");
-            QTEtimer -= Time.unscaledDeltaTime;
-            if (QTEtimer <= 0){ // QTE loss
-                qteObject.SetActive(false);
-                QTEstarted = false;
-                shouldBegin = false;
-                Time.timeScale = 1f;
+    private void Update()
+    {
+        if (!QTEstarted)
+            return;
+
+        if (timerText != null)
+            timerText.text = QTEtimer.ToString("F1");
+
+        QTEtimer -= Time.unscaledDeltaTime;
+
+        if (QTEtimer <= 0f)
+        {
+            // QTE loss.
+            qteObject.SetActive(false);
+            QTEstarted = false;
+            shouldBegin = false;
+            requiredClicksRemaining = 1;
+            isBoomerangQTE = false;
+
+            Time.timeScale = 1f;
+
+            if (gameOver != null)
                 gameOver.PlayersFault = true;
-            }
         }
     }
 
@@ -109,9 +162,35 @@ public class BallCaptureQTE : MonoBehaviour
         if (!QTEstarted || QTEtimer <= 0f)
             return;
 
+        // RamBall requires additional successful clicks.
+        if (requiredClicksRemaining > 1)
+        {
+            requiredClicksRemaining--;
+            QTEtimer += ramBallTimeBonusPerClick;
+            return;
+        }
+
+        // All required clicks completed.
+        requiredClicksRemaining = 1;
+
         qteObject.SetActive(false);
         QTEstarted = false;
         shouldBegin = false;
+
+        if (isBoomerangQTE)
+        {
+            isBoomerangQTE = false;
+
+            if (attackManager != null)
+                attackManager.ReplayPreviousShot(ball);
+            else
+            {
+                Debug.LogError("AttackManager is not assigned!");
+                Time.timeScale = 1f;
+            }
+
+            return;
+        }
 
         if (attackManager != null)
         {
@@ -126,6 +205,9 @@ public class BallCaptureQTE : MonoBehaviour
 
     private void UpdateIndicator()
     {
+        if (mainCamera == null || indicator == null || ball == null)
+            return;
+
         Vector3 screenPosition =
             mainCamera.WorldToScreenPoint(ball.position);
 
@@ -138,6 +220,8 @@ public class BallCaptureQTE : MonoBehaviour
         QTEstarted = false;
         shouldBegin = true;
         isFirstQte = true;
+        requiredClicksRemaining = 1;
+        isBoomerangQTE = false;
 
         qteObject.SetActive(false);
 

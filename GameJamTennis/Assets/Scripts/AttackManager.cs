@@ -59,6 +59,8 @@ public class AttackManager : MonoBehaviour
     private Quaternion cameraStartRotation;
 
     private Vector3 cameraDestinationPosition;
+    private Vector3 originalShotTarget;
+    private bool hasOriginalShotTarget;
     private Quaternion cameraDestinationRotation;
 
     private float transitionTimer;
@@ -379,11 +381,61 @@ public class AttackManager : MonoBehaviour
     {
         shotConfirmed = true;
 
+        originalShotTarget = selectedTarget;
+        hasOriginalShotTarget = true;
+
         StartCameraTransition(
             originalCameraPosition,
             originalCameraRotation,
             AttackState.MovingBack
         );
+    }
+
+    public void ReplayPreviousShot(Transform returningBall)
+    {
+        if (returningBall == null)
+        {
+            Debug.LogError("Boomerang replay: Ball reference is missing!", this);
+            Time.timeScale = 1f;
+            return;
+        }
+
+        if (!hasOriginalShotTarget)
+        {
+            Debug.LogError("Boomerang replay: No original shot target has been saved!", this);
+            Time.timeScale = 1f;
+            return;
+        }
+
+        if (state != AttackState.Inactive)
+        {
+            Debug.LogWarning("Boomerang replay attempted while AttackManager is busy.", this);
+            Time.timeScale = 1f;
+            return;
+        }
+
+        ball = returningBall;
+        playerShot = ball.GetComponent<PlayerShot>();
+
+        if (playerShot == null)
+        {
+            Debug.LogError("Boomerang replay: Ball is missing PlayerShot!", this);
+            Time.timeScale = 1f;
+            return;
+        }
+
+        // Resume physics and launch toward the original target.
+        Time.timeScale = 1f;
+
+        if (playerShot.LaunchShot(originalShotTarget))
+        {
+            NetFault netFault = ball.GetComponent<NetFault>();
+
+            if (netFault != null)
+                netFault.BeginPlayerShot();
+            else
+                Debug.LogWarning("Boomerang replay: Ball has no NetFault component!", this);
+        }
     }
 
     private void FinishAiming()
@@ -416,7 +468,7 @@ public class AttackManager : MonoBehaviour
         }
         else if (shotConfirmed)
         {
-            playerShot.LaunchShot(selectedTarget);
+            if (playerShot.ReplayShot(originalShotTarget))
             ball.GetComponent<NetFault>().BeginPlayerShot();
         }
 

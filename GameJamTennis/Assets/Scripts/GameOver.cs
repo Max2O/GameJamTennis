@@ -11,6 +11,9 @@ public class GameOver : MonoBehaviour
     public Sprite Victory;
     public Sprite Defeat;
 
+    [Header("Card Effects")]
+    [SerializeField] private CardEffectManager cardEffectManager;
+
     private bool trackingPlayerShot;
     private bool playerShotReachedEnemySide;
 
@@ -45,6 +48,16 @@ public class GameOver : MonoBehaviour
 
     public void GameOverFunc()
     {
+        // Remove all card modifiers.
+        if (cardEffectManager != null)
+        {
+            cardEffectManager.ClearAllEffects();
+        }
+        else
+        {
+            Debug.LogWarning("GameOver: CardEffectManager reference is missing.", this);
+        }
+
         Time.timeScale = 0f;
         GameOverUI.SetActive(true);
 

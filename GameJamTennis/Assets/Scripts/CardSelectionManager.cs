@@ -14,6 +14,9 @@ public class CardSelectionManager : MonoBehaviour
     [SerializeField] private int hitsPerSelection = 2;
     [SerializeField] private bool pauseGameWhileSelecting = true;
 
+    [Header("Effect Manager")]
+    [SerializeField] private CardEffectManager effectManager;
+
     private int playerHitCount;
     private float previousTimeScale = 1f;
     private bool isSelecting;
@@ -51,6 +54,9 @@ public class CardSelectionManager : MonoBehaviour
         // Make a temporary copy so the same card can't appear twice.
         List<CardData> randomPool = new List<CardData>(availableCards);
 
+        if (effectManager != null)
+            effectManager.ClearSelectionEffects();
+
         for (int i = 0; i < cardSlots.Length; i++)
         {
             int randomIndex = Random.Range(0, randomPool.Count);
@@ -77,6 +83,7 @@ public class CardSelectionManager : MonoBehaviour
             return;
 
         ownedCards.Add(selectedCard);
+        effectManager.ApplyCard(selectedCard);
 
         selectionPanel.SetActive(false);
         isSelecting = false;
