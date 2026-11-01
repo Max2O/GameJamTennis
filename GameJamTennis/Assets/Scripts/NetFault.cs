@@ -47,18 +47,16 @@ public class NetFault : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void Update()
     {
         if (!hasTouchedNet || hasTriggeredGameOver)
             return;
 
-        bool returnedToOwnSide =
-            (currentShotOwner == ShotOwner.Player &&
-             other == playerSideTableArea) ||
-            (currentShotOwner == ShotOwner.Enemy &&
-             other == enemySideTableArea);
+        Collider ownSide = currentShotOwner == ShotOwner.Player
+            ? playerSideTableArea
+            : enemySideTableArea;
 
-        if (returnedToOwnSide)
+        if (ownSide != null && ownSide.bounds.Intersects(GetComponent<Collider>().bounds))
         {
             TriggerGameOver();
         }
