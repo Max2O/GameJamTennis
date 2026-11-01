@@ -1873,6 +1873,59 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1164882642}
   m_CullTransparentMesh: 1
+--- !u!1 &1210600781
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1210600782}
+  - component: {fileID: 1210600783}
+  m_Layer: 0
+  m_Name: CrouchDashEnemy
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1210600782
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210600781}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1512842135}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1210600783
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210600781}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.69, y: 1, z: 1.58}
+  m_Center: {x: 0, y: -1.15, z: -0.65}
 --- !u!1 &1249077154
 GameObject:
   m_ObjectHideFlags: 0
@@ -2135,7 +2188,8 @@ Transform:
   m_LocalPosition: {x: -1232.469, y: -65.649, z: 1.472}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1210600782}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1512842137
@@ -3508,7 +3562,7 @@ Transform:
   m_GameObject: {fileID: 4085996643442510468}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0.000000029802322, z: -0.000000014901161, w: 0.70710677}
-  m_LocalPosition: {x: -1232.433, y: -64.669, z: -1.454}
+  m_LocalPosition: {x: -1232.433, y: -64.55, z: -1.47}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3653,8 +3707,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08a2faf463ec1aa459558a066694370c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerShot
-  lowBallHeight: 0.15
-  highBallHeight: 1.2
+  lowBallHeight: -65
+  highBallHeight: -66
   maximumShotDistance: 2
   maximumDownwardSpeed: 3.5
   maximumLobSpeed: 5
