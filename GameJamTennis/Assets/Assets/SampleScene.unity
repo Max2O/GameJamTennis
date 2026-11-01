@@ -343,6 +343,7 @@ GameObject:
   - component: {fileID: 39987509}
   - component: {fileID: 39987511}
   - component: {fileID: 39987512}
+  - component: {fileID: 39987513}
   m_Layer: 0
   m_Name: game controller
   m_TagString: Untagged
@@ -424,6 +425,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EffectManager
   playerShot: {fileID: 6638213139023779481}
+--- !u!114 &39987513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 39987508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10bc87883dfb3b14c912dde283848b69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ExitScr
 --- !u!1001 &73140548
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1119,7 +1132,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 293693325}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 39987513}
+        m_TargetAssemblyTypeName: ExitScr, Assembly-CSharp
+        m_MethodName: QuitGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &293693325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2843,7 +2868,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1428665439
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4998,11 +5023,11 @@ MonoBehaviour:
   heightArcWeight: 0.65
   distanceArcWeight: 0.35
   tableHeight: -66.33
-  cardEffectManager: {fileID: 0}
-  tableCollider: {fileID: 0}
-  playerHitbox: {fileID: 0}
-  netCollider: {fileID: 0}
-  ballCaptureQTE: {fileID: 0}
+  cardEffectManager: {fileID: 39987512}
+  tableCollider: {fileID: 1071336940}
+  playerHitbox: {fileID: 1888101115}
+  netCollider: {fileID: 7703866214700848406}
+  ballCaptureQTE: {fileID: 1888101117}
   boomerangReturnSpeed: 5
   boomerangReturnArcHeight: 0.5
 --- !u!114 &6638213139023779482
