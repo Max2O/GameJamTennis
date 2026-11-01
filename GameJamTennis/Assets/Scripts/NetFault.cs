@@ -22,6 +22,9 @@ public class NetFault : MonoBehaviour
     public void BeginPlayerShot()
     {
         BeginShot(ShotOwner.Player);
+
+        if (gameOver != null)
+            gameOver.BeginPlayerShot();
     }
 
     public void BeginEnemyShot()
@@ -34,6 +37,22 @@ public class NetFault : MonoBehaviour
         currentShotOwner = owner;
         hasTouchedNet = false;
         hasTriggeredGameOver = false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (hasTriggeredGameOver)
+            return;
+
+        // Check whether the player's shot reached the enemy's side.
+        if (currentShotOwner == ShotOwner.Player &&
+            enemySideTableArea != null &&
+            (other == enemySideTableArea ||
+            other.transform.IsChildOf(enemySideTableArea.transform)))
+        {
+            if (gameOver != null)
+                gameOver.PlayerShotReachedEnemySide();
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -64,25 +83,19 @@ public class NetFault : MonoBehaviour
 
     private void TriggerGameOver()
     {
-        if(currentShotOwner == ShotOwner.Enemy)
-        {
-            gameOver.PlayersFault = false;
-        }
-        else
-        {
-            gameOver.PlayersFault = true;
-        }
         hasTriggeredGameOver = true;
-        currentShotOwner = ShotOwner.None;
 
         if (gameOver != null)
         {
+            gameOver.PlayersFault = currentShotOwner == ShotOwner.Player;
             gameOver.GameOverFunc();
         }
         else
         {
             Debug.LogError("NetFault: GameOver reference is missing!");
         }
+
+        currentShotOwner = ShotOwner.None;
     }
 
     public void ResetFault()

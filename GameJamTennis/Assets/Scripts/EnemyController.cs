@@ -7,17 +7,23 @@ public class EnemyController : MonoBehaviour
     {
         Idle,
         Swinging,
-        Hit
+        Hit,
+        Crouching,
+        CrouchingHit
     }
 
     [Header("References")]
     [SerializeField] private Transform ball;
     [SerializeField] private Renderer enemyRenderer;
 
-    [Header("Pose Materials")]
+    [Header("Normal Pose Materials")]
     [SerializeField] private Material idleMaterial;
     [SerializeField] private Material swingingMaterial;
     [SerializeField] private Material hitMaterial;
+
+    [Header("Crouching Pose Materials")]
+    [SerializeField] private Material crouchingSwingingMaterial;
+    [SerializeField] private Material crouchingHitMaterial;
 
     [Header("Movement")]
     [SerializeField] private float followSpeed = 3f;
@@ -30,13 +36,23 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float hitDuration = 0.3f;
 
     private EnemyState currentState = EnemyState.Idle;
+
     private float hitTimer;
+    private float originalZ;
+
+    private bool lowZoneActive;
+
+    private void Awake()
+    {
+        originalZ = transform.position.z;
+    }
 
     private void Update()
     {
         FollowBall();
 
-        if (currentState == EnemyState.Hit)
+        if (currentState == EnemyState.Hit ||
+            currentState == EnemyState.CrouchingHit)
         {
             hitTimer -= Time.deltaTime;
 
@@ -56,13 +72,23 @@ public class EnemyController : MonoBehaviour
         if (ball == null)
             return;
 
-        float targetX = ball.position.x;
-
         Vector3 position = transform.position;
 
+        // Always follow the ball along X.
         position.x = Mathf.MoveTowards(
             position.x,
-            targetX,
+            ball.position.x,
+            followSpeed * Time.deltaTime
+        );
+
+        // Follow along Z only while crouching.
+        float targetZ = lowZoneActive
+            ? ball.position.z
+            : originalZ;
+
+        position.z = Mathf.MoveTowards(
+            position.z,
+            targetZ,
             followSpeed * Time.deltaTime
         );
 
@@ -71,19 +97,18 @@ public class EnemyController : MonoBehaviour
 
     private void UpdateSuitablePose()
     {
+        if (lowZoneActive)
+        {
+            SetState(EnemyState.Crouching);
+            return;
+        }
+
         if (ball == null)
             return;
 
-        bool ballOnEnemySide;
-
-        if (enemySideIsPositiveZ)
-        {
-            ballOnEnemySide = ball.position.z > tableCenterZ;
-        }
-        else
-        {
-            ballOnEnemySide = ball.position.z < tableCenterZ;
-        }
+        bool ballOnEnemySide = enemySideIsPositiveZ
+            ? ball.position.z > tableCenterZ
+            : ball.position.z < tableCenterZ;
 
         SetState(
             ballOnEnemySide
@@ -92,10 +117,24 @@ public class EnemyController : MonoBehaviour
         );
     }
 
-    public void OnBallHit()
+    public void SetLowZoneActive(bool active)
+    {
+        lowZoneActive = active;
+        UpdateSuitablePose();
+    }
+
+    public void OnBallHit(bool lowHit)
     {
         hitTimer = hitDuration;
-        SetState(EnemyState.Hit);
+
+        if (lowHit)
+        {
+            SetState(EnemyState.CrouchingHit);
+        }
+        else
+        {
+            SetState(EnemyState.Hit);
+        }
     }
 
     private void SetState(EnemyState newState)
@@ -117,6 +156,14 @@ public class EnemyController : MonoBehaviour
 
             case EnemyState.Hit:
                 enemyRenderer.sharedMaterial = hitMaterial;
+                break;
+
+            case EnemyState.Crouching:
+                enemyRenderer.sharedMaterial = crouchingSwingingMaterial;
+                break;
+
+            case EnemyState.CrouchingHit:
+                enemyRenderer.sharedMaterial = crouchingHitMaterial;
                 break;
         }
     }

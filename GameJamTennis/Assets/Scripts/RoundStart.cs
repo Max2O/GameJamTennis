@@ -88,6 +88,11 @@ public class RoundStart : MonoBehaviour
         if (netFault != null)
             netFault.ResetFault();
 
+        GameOver gameOver = FindFirstObjectByType<GameOver>();
+
+        if (gameOver != null)
+            gameOver.ResetGameOver();
+
         // Reset the trajectory state.
         enemyReturnTrajectory = ball.GetComponent<EnemyReturnTrajectory>();
 

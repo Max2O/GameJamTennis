@@ -1579,6 +1579,96 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1034011318
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1034011319}
+  - component: {fileID: 1034011320}
+  - component: {fileID: 1034011321}
+  - component: {fileID: 1034011322}
+  m_Layer: 0
+  m_Name: CrouchAttackZone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1034011319
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1034011318}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1512842135}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1034011320
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1034011318}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.69, y: 0.5338044, z: 1.5800002}
+  m_Center: {x: 0, y: -1.3830979, z: -0.65}
+--- !u!114 &1034011321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1034011318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c89d455dfe642f24790b40043b3b1b87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHitbox
+  enemy: {fileID: 1606314130}
+  isLowSwingHitbox: 1
+--- !u!114 &1034011322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1034011318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6e64ca49887c884e8deb0510f0c269f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyBounceBack
+  bouncebackPercent: 200
+  playerHitbox: {fileID: 1888101114}
+  ballCaptureQTE: {fileID: 1888101117}
+  ball: {fileID: 4085996643442510468}
+  net: {fileID: 7703866214700848406}
+  baseLaunchSpeed: 1
+  minimumArcHeight: 0.1
+  tableSurface: {fileID: 1071336940}
+  playerSideTableArea: {fileID: 1575550751}
 --- !u!1 &1065975313
 GameObject:
   m_ObjectHideFlags: 0
@@ -1936,8 +2026,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1210600782}
   - component: {fileID: 1210600783}
+  - component: {fileID: 1210600784}
   m_Layer: 0
-  m_Name: CrouchDashEnemy
+  m_Name: CrouchZone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1979,6 +2070,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4.69, y: 1, z: 1.58}
   m_Center: {x: 0, y: -1.15, z: -0.65}
+--- !u!114 &1210600784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210600781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0a0a529a888a7c4993260dd98a58fe1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyLowZone
+  enemy: {fileID: 1606314130}
 --- !u!1 &1249077154
 GameObject:
   m_ObjectHideFlags: 0
@@ -2243,6 +2347,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1210600782}
+  - {fileID: 1034011319}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1512842137
@@ -2279,6 +2384,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   enemy: {fileID: 1606314130}
+  isLowSwingHitbox: 0
 --- !u!1 &1575550749
 GameObject:
   m_ObjectHideFlags: 0
@@ -2653,6 +2759,8 @@ MonoBehaviour:
   idleMaterial: {fileID: 2100000, guid: d622ba784f5d50640a197cce8c5edb51, type: 2}
   swingingMaterial: {fileID: 2100000, guid: d325c6d5d0f208640b65b9511be1ac2a, type: 2}
   hitMaterial: {fileID: 2100000, guid: 51bde7c68ba9ad6479e9f747fe96178e, type: 2}
+  crouchingSwingingMaterial: {fileID: 2100000, guid: a77b209a21edc3b468a1277c8b69e1d5, type: 2}
+  crouchingHitMaterial: {fileID: 2100000, guid: ca5b514a9ded4d3449f15a88c18f81dc, type: 2}
   followSpeed: 3
   tableCenterZ: 0
   enemySideIsPositiveZ: 1
