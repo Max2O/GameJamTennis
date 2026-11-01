@@ -19,6 +19,7 @@ public class AttackManager : MonoBehaviour
     [SerializeField] private Transform overheadCameraPosition;
     [SerializeField] private Transform aimMarker;
     [SerializeField] private LineRenderer trajectoryLine;
+    [SerializeField] private CardSelectionManager cardSelectionManager;
 
     [Header("Targeting")]
     [SerializeField] private LayerMask aimSurfaceMask;
@@ -421,5 +422,6 @@ public class AttackManager : MonoBehaviour
 
         state = AttackState.Inactive;
         IsAiming = false;
+        cardSelectionManager.RegisterPlayerHit();
     }
 }
