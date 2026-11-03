@@ -1,0 +1,143 @@
+[gd_scene format=3 uid="uid://bwhm8hpqgipro"]
+
+[ext_resource type="Script" uid="uid://bvkcjlrk1o286" path="res://scripts/racketscr.gd" id="1_cdqbm"]
+[ext_resource type="PackedScene" uid="uid://cwc0f86nrnynr" path="res://3dassets/Tennis.fbx" id="1_noarx"]
+[ext_resource type="PackedScene" uid="uid://csq4wmo1iu6ka" path="res://3dassets/Racket.fbx" id="1_tereu"]
+[ext_resource type="Texture2D" uid="uid://dt72folecmpy8" path="res://2dassets/enemysprites/pumpkinheadsprites/PumpkinheadStanding.png" id="2_a0tk4"]
+[ext_resource type="Script" uid="uid://bk05km6b7es7c" path="res://scripts/ballshot.gd" id="2_jsk3o"]
+[ext_resource type="PackedScene" uid="uid://b0er2v8ux2k5u" path="res://3dassets/The ball.fbx" id="3_a0tk4"]
+[ext_resource type="Script" uid="uid://sf8dqfqwrwl8" path="res://scripts/enemyspritechange.gd" id="3_wc5p8"]
+[ext_resource type="Script" uid="uid://dyo7j0bc3h0o8" path="res://scripts/enemyreturntrajectory.gd" id="4_4arys"]
+[ext_resource type="Script" uid="uid://by25d6wt2tenj" path="res://scripts/enemyvisualsize.gd" id="4_r3fl7"]
+[ext_resource type="Texture2D" uid="uid://c8q4g0xs78o04" path="res://2dassets/enemysprites/pumpkinheadsprites/PumpkinheadSwing.png" id="5_jsk3o"]
+[ext_resource type="Texture2D" uid="uid://cnjc7hfnefpv3" path="res://2dassets/enemysprites/pumpkinheadsprites/PumpkinheadHit.png" id="6_4arys"]
+[ext_resource type="Script" uid="uid://d2g6xecryx0t5" path="res://scripts/enemybounceback.gd" id="10_6iypd"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dx6j3"]
+size = Vector3(1.4719238, 0.80462646, 0.15808105)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_287x5"]
+size = Vector3(2.6953125, 1.7174711, 0.001)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mbdlv"]
+size = Vector3(1, 0.83410645, 0.27618408)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6o62y"]
+size = Vector3(1.513916, 0.50164795, 2.70401)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_k4bcs"]
+size = Vector3(1, 0.045959473, 1.1025391)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_noarx"]
+size = Vector3(1.513916, 0.1669159, 0.036548615)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_a0tk4"]
+friction = 0.31
+bounce = 0.5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_k4bcs"]
+radius = 0.027185498
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_r3fl7"]
+size = Vector3(1, 1.9296875, 0.60491943)
+
+[node name="Node3D" type="Node3D" unique_id=1742332519]
+
+[node name="Player" type="Node3D" parent="." unique_id=1689920000]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2687708, 2.015874)
+
+[node name="Camera3D" type="Camera3D" parent="Player" unique_id=1056606864]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.13500977)
+
+[node name="PlayerArea" type="Area3D" parent="Player" unique_id=659880845]
+
+[node name="CollisionShape3d" type="CollisionShape3D" parent="Player/PlayerArea" unique_id=1885585436]
+transform = Transform3D(0.83220464, 0, 0, 0, 1, 0, 0, 0, 1, -0.005004883, -0.036224365, -0.58306885)
+shape = SubResource("BoxShape3D_dx6j3")
+
+[node name="AimPlane" type="StaticBody3D" parent="Player" unique_id=2008683123]
+collision_layer = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player/AimPlane" unique_id=1095482958]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20825195, 0.07132399, -0.6362517)
+shape = SubResource("BoxShape3D_287x5")
+
+[node name="Racket" type="Area3D" parent="Player" unique_id=1427079181 node_paths=PackedStringArray("camera")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5078318)
+script = ExtResource("1_cdqbm")
+camera = NodePath("../Camera3D")
+aim_collision_mask = 2
+
+[node name="RacketMesh" parent="Player/Racket" unique_id=348384407 instance=ExtResource("1_tereu")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player/Racket" unique_id=1472067027]
+transform = Transform3D(0.22877002, 0, 0, 0, 0.47486448, 0, 0, 0, 0.43480116, 0, -0.039388537, -0.044849634)
+shape = SubResource("BoxShape3D_mbdlv")
+
+[node name="Table" type="StaticBody3D" parent="." unique_id=500232103]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.37143332)
+
+[node name="TableMesh" parent="Table" unique_id=603902434 instance=ExtResource("1_noarx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2472496, 0, 0)
+
+[node name="TableCollision3D" type="CollisionShape3D" parent="Table" unique_id=1882898870]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0072021484, 0.5480321, 0.36524636)
+shape = SubResource("BoxShape3D_6o62y")
+
+[node name="PlayerArea" type="Area3D" parent="Table" unique_id=712651176]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Table/PlayerArea" unique_id=1819983497]
+transform = Transform3D(1.5093709, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7737732, 1.0467436)
+shape = SubResource("BoxShape3D_k4bcs")
+
+[node name="Net" type="StaticBody3D" parent="Table" unique_id=1312388858]
+
+[node name="NetCollision3D" type="CollisionShape3D" parent="Table/Net" unique_id=1336175505]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.014404297, 0.8660456, 0.36749184)
+shape = SubResource("BoxShape3D_noarx")
+
+[node name="Ball" type="RigidBody3D" parent="." unique_id=165648856]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.47615075, 5.870287, -1.6698728)
+physics_material_override = SubResource("PhysicsMaterial_a0tk4")
+continuous_cd = true
+script = ExtResource("2_jsk3o")
+
+[node name="BallMesh" parent="Ball" unique_id=1418754075 instance=ExtResource("3_a0tk4")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ball" unique_id=1598299168]
+shape = SubResource("SphereShape3D_k4bcs")
+
+[node name="EnemyReturnTrajectory" type="Node" parent="Ball" unique_id=953105687]
+script = ExtResource("4_4arys")
+
+[node name="Enemy" type="Node3D" parent="." unique_id=472701689 node_paths=PackedStringArray("ball", "sprite")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7775097, -1.7248769)
+script = ExtResource("3_wc5p8")
+ball = NodePath("../Ball")
+sprite = NodePath("Sprite3D")
+idle_texture = ExtResource("2_a0tk4")
+ready_texture = ExtResource("5_jsk3o")
+hitting_texture = ExtResource("6_4arys")
+
+[node name="Sprite3D" type="Sprite3D" parent="Enemy" unique_id=1211682932]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.031, 0.307, 0)
+texture = ExtResource("2_a0tk4")
+script = ExtResource("4_r3fl7")
+reference_texture = ExtResource("2_a0tk4")
+
+[node name="Area3D" type="Area3D" parent="Enemy" unique_id=208842089 node_paths=PackedStringArray("ball", "player_hitbox", "player_side_area", "table", "net", "enemy_sprite")]
+script = ExtResource("10_6iypd")
+ball = NodePath("../../Ball")
+player_hitbox = NodePath("../../Player/PlayerArea")
+player_side_area = NodePath("../../Table/PlayerArea")
+table = NodePath("../../Table")
+net = NodePath("../../Table/Net")
+enemy_sprite = NodePath("../Sprite3D")
+attacking_texture = ExtResource("6_4arys")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Enemy/Area3D" unique_id=1313217851]
+transform = Transform3D(6.4141264, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9348602, 0.021972656)
+shape = SubResource("BoxShape3D_r3fl7")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1810489194]
+transform = Transform3D(1, 0, 0, 0, 0.5075164, 0.8616421, 0, -0.8616421, 0.5075164, 0, 1.3710378, -0.37143332)
